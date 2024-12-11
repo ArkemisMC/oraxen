@@ -67,7 +67,8 @@ public class ItemBuilder {
     private Set<ItemFlag> itemFlags;
     private boolean hasAttributeModifiers;
     private Multimap<Attribute, AttributeModifier> attributeModifiers;
-    @Nullable private Integer customModelData;
+    @Nullable
+    private Integer customModelData;
     private List<String> lore;
     private ItemStack finalItemStack;
 
@@ -173,7 +174,8 @@ public class ItemBuilder {
         }
 
         if (itemMeta.hasDisplayName()) {
-            if (VersionUtil.isPaperServer()) displayName = AdventureUtils.MINI_MESSAGE.serialize(itemMeta.displayName());
+            if (VersionUtil.isPaperServer())
+                displayName = AdventureUtils.MINI_MESSAGE.serialize(itemMeta.displayName());
             else displayName = itemMeta.getDisplayName();
         }
 
@@ -191,7 +193,8 @@ public class ItemBuilder {
         customModelData = itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : null;
 
         if (itemMeta.hasLore()) {
-            if (VersionUtil.isPaperServer()) lore = itemMeta.lore().stream().map(AdventureUtils.MINI_MESSAGE::serialize).toList();
+            if (VersionUtil.isPaperServer())
+                lore = itemMeta.lore().stream().map(AdventureUtils.MINI_MESSAGE::serialize).toList();
             else lore = itemMeta.getLore();
         }
 
@@ -783,11 +786,10 @@ public class ItemBuilder {
                 pdc.set(dataSpace.getKey().namespacedKey(), (PersistentDataType<?, Object>) dataSpace.getKey().dataType(), dataSpace.getValue());
 
         if (VersionUtil.isPaperServer()) {
-            @Nullable List<Component> loreLines = lore != null? lore.stream().map(AdventureUtils.MINI_MESSAGE::deserialize).toList() : new ArrayList<>();
+            @Nullable List<Component> loreLines = lore != null ? lore.stream().map(AdventureUtils.MINI_MESSAGE::deserialize).toList() : new ArrayList<>();
             loreLines = loreLines.stream().map(c -> c.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)).toList();
             itemMeta.lore(lore != null ? loreLines : null);
-        }
-        else itemMeta.setLore(lore);
+        } else itemMeta.setLore(lore);
 
         itemStack.setItemMeta(itemMeta);
         finalItemStack = NMSHandlers.getHandler().consumableComponent(itemStack, consumableComponent);
@@ -808,7 +810,8 @@ public class ItemBuilder {
                 String trimPattern = this.getTrimPatternKey().asString();
                 yamlConfiguration.set(itemId + ".trim_pattern", trimPattern);
             }
-            if (!getItemFlags().isEmpty()) yamlConfiguration.set(itemId + ".ItemFlags", this.itemFlags.stream().map(ItemFlag::name).toList());
+            if (!getItemFlags().isEmpty())
+                yamlConfiguration.set(itemId + ".ItemFlags", this.itemFlags.stream().map(ItemFlag::name).toList());
             if (hasEquippableComponent()) {
                 yamlConfiguration.set(itemId + ".Components.equippable.slot", this.equippableComponent.getSlot().name());
                 yamlConfiguration.set(itemId + ".Components.equippable.model", this.equippableComponent.getModel().toString());

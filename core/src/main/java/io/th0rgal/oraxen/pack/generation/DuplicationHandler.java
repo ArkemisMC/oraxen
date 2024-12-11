@@ -28,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 public class DuplicationHandler {
 
     public static final String DUPLICATE_FILE_FOLDER = "migrated_duplicates/";
+    private static final String DUPLICATE_LINE_STRING = "// This file was recognized as a duplicate and was migrated into its relevant config(s)";
 
     public static File getDuplicateItemFile(Material material) {
         return OraxenPlugin.get().getDataFolder().toPath().resolve("items")
@@ -239,8 +240,6 @@ public class DuplicationHandler {
         return charList;
     }
 
-    private static final String DUPLICATE_LINE_STRING = "// This file was recognized as a duplicate and was migrated into its relevant config(s)";
-
     /**
      * Check if the file already exists in the zip file
      */
@@ -443,17 +442,17 @@ public class DuplicationHandler {
     }
 
     private static void handleBowPulling(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, List<String>> pullingModels) {
+                                         Map<Integer, List<String>> pullingModels) {
         handleExtraListPredicates(overrides, overridesToRemove, pullingModels, "pulling");
     }
 
     private static void handleDamaged(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, List<String>> damagedModels) {
+                                      Map<Integer, List<String>> damagedModels) {
         handleExtraListPredicates(overrides, overridesToRemove, damagedModels, "damaged");
     }
 
     private static void handleExtraListPredicates(@NotNull List<JsonObject> overrides,
-            List<JsonElement> overridesToRemove, Map<Integer, List<String>> predicateModels, String predicate) {
+                                                  List<JsonElement> overridesToRemove, Map<Integer, List<String>> predicateModels, String predicate) {
         for (JsonObject object : overrides) {
             if (object.get("predicate") == null || !object.get("predicate").isJsonObject())
                 continue;
@@ -469,22 +468,22 @@ public class DuplicationHandler {
     }
 
     private static void handleCrossbowPulling(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, String> chargedModels) {
+                                              Map<Integer, String> chargedModels) {
         handleExtraPredicates(overrides, overridesToRemove, chargedModels, "charged");
     }
 
     private static void handleShieldBlocking(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, String> blockingModels) {
+                                             Map<Integer, String> blockingModels) {
         handleExtraPredicates(overrides, overridesToRemove, blockingModels, "blocking");
     }
 
     private static void handleFishingRodCast(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, String> castModels) {
+                                             Map<Integer, String> castModels) {
         handleExtraPredicates(overrides, overridesToRemove, castModels, "cast");
     }
 
     private static void handleExtraPredicates(@NotNull List<JsonObject> overrides, List<JsonElement> overridesToRemove,
-            Map<Integer, String> predicateModels, String predicate) {
+                                              Map<Integer, String> predicateModels, String predicate) {
         for (JsonObject object : overrides) {
             if (object.get("predicate") == null || !object.get("predicate").isJsonObject())
                 continue;

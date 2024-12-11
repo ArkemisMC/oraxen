@@ -8,7 +8,7 @@
 diamond_sword: # A simple skinnable diamond sword
   material: DIAMOND_SWORD
   Mechanics:
-    skinnable: {}
+    skinnable: { }
 
 great_sword:
   displayname: "<#D5D6D8><bold>SKIN: <gradient:#3685EC:#72C1E4>Great Sword"

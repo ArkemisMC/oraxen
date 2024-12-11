@@ -13,6 +13,18 @@ import java.util.Set;
 
 public interface NMSHandler {
 
+    /**
+     * Keys that are used by vanilla Minecraft and should therefore be skipped
+     * Some are accessed through API methods, others are just used internally
+     */
+    Set<String> vanillaKeys = Set.of("PublicBukkitValues", "display", "CustomModelData", "Damage", "AttributeModifiers",
+            "Unbreakable", "CanDestroy", "slot", "count", "HideFlags", "CanPlaceOn", "Enchantments", "StoredEnchantments",
+            "RepairCost", "CustomPotionEffects", "Potion", "CustomPotionColor", "Trim", "EntityTag",
+            "pages", "filtered_pages", "filtered_title", "resolved", "generation", "author", "title",
+            "BucketVariantTag", "Items", "LodestoneTracked", "LodestoneDimension", "LodestonePos",
+            "ChargedProjectiles", "Charged", "DebugProperty", "Fireworks", "Explosion", "Flight",
+            "map", "map_scale_direction", "map_to_lock", "Decorations", "SkullOwner", "Effects", "BlockEntityTag", "BlockStateTag");
+
     GlyphHandler glyphHandler();
 
     boolean noteblockUpdatesDisabled();
@@ -34,14 +46,16 @@ public interface NMSHandler {
      * Corrects the BlockData of a placed block.
      * Mainly fired when placing a block against an OraxenNoteBlock due to vanilla behaviour requiring Sneaking
      *
-     * @param player          The player that placed the block
-     * @param slot            The hand the player placed the block with
-     * @param itemStack       The ItemStack the player placed the block with
+     * @param player    The player that placed the block
+     * @param slot      The hand the player placed the block with
+     * @param itemStack The ItemStack the player placed the block with
      * @return The corrected BlockData
      */
     @Nullable BlockData correctBlockStates(Player player, EquipmentSlot slot, ItemStack itemStack);
 
-    /**Removes mineable/axe tag from noteblocks for custom blocks */
+    /**
+     * Removes mineable/axe tag from noteblocks for custom blocks
+     */
     void customBlockDefaultTools(Player player);
 
     default void foodComponent(ItemBuilder itemBuilder, ConfigurationSection foodSection) {
@@ -59,18 +73,6 @@ public interface NMSHandler {
     default void consumableComponent(ItemBuilder itemBuilder, ConfigurationSection consumableSection) {
 
     }
-
-    /**
-     * Keys that are used by vanilla Minecraft and should therefore be skipped
-     * Some are accessed through API methods, others are just used internally
-     */
-    Set<String> vanillaKeys = Set.of("PublicBukkitValues", "display", "CustomModelData", "Damage", "AttributeModifiers",
-            "Unbreakable", "CanDestroy", "slot", "count", "HideFlags", "CanPlaceOn", "Enchantments", "StoredEnchantments",
-            "RepairCost", "CustomPotionEffects", "Potion", "CustomPotionColor", "Trim", "EntityTag",
-            "pages", "filtered_pages", "filtered_title", "resolved", "generation", "author", "title",
-            "BucketVariantTag", "Items", "LodestoneTracked", "LodestoneDimension", "LodestonePos",
-            "ChargedProjectiles", "Charged", "DebugProperty", "Fireworks", "Explosion", "Flight",
-            "map", "map_scale_direction", "map_to_lock", "Decorations", "SkullOwner", "Effects", "BlockEntityTag", "BlockStateTag");
 
     default boolean getSupported() {
         return false;

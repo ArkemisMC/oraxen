@@ -32,14 +32,15 @@ import java.util.stream.Stream;
 
 public class FontManager {
 
+    public static Map<String, GlyphBitMap> glyphBitMaps = new HashMap<>();
     public final boolean autoGenerate;
     public final String permsChatcolor;
-    public static Map<String, GlyphBitMap> glyphBitMaps = new HashMap<>();
     private final Map<String, Glyph> glyphMap;
     private final Map<String, Glyph> glyphByPlaceholder;
     private final Map<Character, String> reverse;
     private final FontEvents fontEvents;
     private final Set<Font> fonts;
+    private final Map<UUID, List<String>> currentGlyphCompletions = new HashMap<>();
     private boolean useNmsGlyphs;
 
     public FontManager(final ConfigsManager configsManager) {
@@ -74,19 +75,19 @@ public class FontManager {
             NMSHandlers.getHandler().glyphHandler().setupNmsGlyphs();
             Logs.logSuccess("Oraxens NMS Glyph system has been enabled!");
             Logs.logInfo("Disabling packet-based glyph systems", true);
-            if (PluginUtils.isEnabled("ProtocolLib")){
+            if (PluginUtils.isEnabled("ProtocolLib")) {
                 ProtocolLibrary.getProtocolManager().removePacketListener(new InventoryPacketListener());
                 ProtocolLibrary.getProtocolManager().removePacketListener(new TitlePacketListener());
             }
         }
     }
 
-    public boolean useNmsGlyphs() {
-        return useNmsGlyphs;
-    }
-
     public static GlyphBitMap getGlyphBitMap(String id) {
         return id != null ? glyphBitMaps.getOrDefault(id, null) : null;
+    }
+
+    public boolean useNmsGlyphs() {
+        return useNmsGlyphs;
     }
 
     public void verifyRequired() {
@@ -179,6 +180,7 @@ public class FontManager {
 
     /**
      * Get a Glyph from a given Glyph-ID
+     *
      * @param id The Glyph-ID
      * @return Returns the Glyph if it exists, otherwise the required Glyph
      */
@@ -189,6 +191,7 @@ public class FontManager {
 
     /**
      * Get a Glyph from a given Glyph-ID
+     *
      * @param id The Glyph-ID
      * @return Returns the Glyph if it exists, otherwise null
      */
@@ -224,7 +227,6 @@ public class FontManager {
         return output.toString();
     }
 
-    private final Map<UUID, List<String>> currentGlyphCompletions = new HashMap<>();
     public void sendGlyphTabCompletion(Player player) {
         List<String> completions = getGlyphByPlaceholderMap().values().stream()
                 .filter(Glyph::hasTabCompletion)

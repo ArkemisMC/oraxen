@@ -7,6 +7,7 @@ public interface GlyphHandler {
     void setupNmsGlyphs();
 
     void inject(Player player);
+
     void uninject(Player player);
 
     class EmptyGlyphHandler implements GlyphHandler {

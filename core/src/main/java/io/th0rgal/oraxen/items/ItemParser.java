@@ -275,7 +275,7 @@ public class ItemParser {
         item.setUseRemainder(result);
     }
 
-    @SuppressWarnings({ "UnstableApiUsage", "unchecked" })
+    @SuppressWarnings({"UnstableApiUsage", "unchecked"})
     private void parseToolComponent(ItemBuilder item, @NotNull ConfigurationSection toolSection) {
         ToolComponent toolComponent = new ItemStack(type).getItemMeta().getTool();
         toolComponent.setDamagePerBlock(Math.max(toolSection.getInt("damage_per_block", 1), 0));
@@ -398,7 +398,7 @@ public class ItemParser {
         oraxenMeta.setExcludedFromCommands(section.getBoolean("excludeFromCommands", false));
     }
 
-    @SuppressWarnings({ "unchecked", "deprecation" })
+    @SuppressWarnings({"unchecked", "deprecation"})
     private void parseVanillaSections(ItemBuilder item) {
         ConfigurationSection section = mergeWithTemplateSection();
         if (section.contains("ItemFlags")) {

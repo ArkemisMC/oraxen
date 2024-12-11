@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.th0rgal.oraxen.OraxenPlugin;
 import io.th0rgal.oraxen.api.OraxenItems;
-import io.th0rgal.oraxen.config.Settings;
 import io.th0rgal.oraxen.config.Message;
+import io.th0rgal.oraxen.config.Settings;
 import io.th0rgal.oraxen.items.ItemBuilder;
 import io.th0rgal.oraxen.pack.generation.OraxenDatapack;
 import io.th0rgal.oraxen.utils.VirtualFile;
@@ -18,7 +18,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.Tag;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
@@ -280,10 +283,10 @@ public class TrimArmorDatapack extends OraxenDatapack {
     private String armorPrefix(VirtualFile virtualFile) {
         return virtualFile.getPath().endsWith("_armor_layer_1.png")
                 ? StringUtils.substringAfterLast(
-                        StringUtils.substringBefore(virtualFile.getPath(), "_armor_layer_1.png"), "/")
+                StringUtils.substringBefore(virtualFile.getPath(), "_armor_layer_1.png"), "/")
                 : virtualFile.getPath().endsWith("_armor_layer_2.png")
-                        ? StringUtils.substringAfterLast(
-                                StringUtils.substringBefore(virtualFile.getPath(), "_armor_layer_2.png"), "/")
-                        : "";
+                ? StringUtils.substringAfterLast(
+                StringUtils.substringBefore(virtualFile.getPath(), "_armor_layer_2.png"), "/")
+                : "";
     }
 }

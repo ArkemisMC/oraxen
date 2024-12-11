@@ -45,7 +45,8 @@ public class MiscListener implements Listener {
     @EventHandler
     public void onHopperCompost(InventoryMoveItemEvent event) {
         Inventory source = event.getSource();
-        if (source.getType() != InventoryType.HOPPER || event.getDestination().getType() != InventoryType.COMPOSTER) return;
+        if (source.getType() != InventoryType.HOPPER || event.getDestination().getType() != InventoryType.COMPOSTER)
+            return;
         Block hopper = source.getLocation() != null ? source.getLocation().getBlock() : null;
         if (hopper == null || hopper.getType() != Material.HOPPER) return;
         Block composter = hopper.getRelative(BlockFace.DOWN);

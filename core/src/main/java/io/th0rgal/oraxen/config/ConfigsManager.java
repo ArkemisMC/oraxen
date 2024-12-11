@@ -33,6 +33,16 @@ public class ConfigsManager {
     private final YamlConfiguration defaultSound;
     private final YamlConfiguration defaultLanguage;
     private final YamlConfiguration defaultHud;
+    // Skip optional keys and subkeys
+    private final List<String> skippedYamlKeys =
+            List.of(
+                    "oraxen_inventory.menu_layout",
+                    "Misc.armor_equip_event_bypass"
+            );
+    private final List<String> removedYamlKeys =
+            List.of(
+                    "armorpotioneffects"
+            );
     private YamlConfiguration mechanics;
     private YamlConfiguration settings;
     private YamlConfiguration font;
@@ -160,11 +170,12 @@ public class ConfigsManager {
             }
         }
 
-        for (String key : configuration.getKeys(false)) if (removedYamlKeys.contains(key)) {
+        for (String key : configuration.getKeys(false))
+            if (removedYamlKeys.contains(key)) {
                 updated = true;
                 Message.REMOVING_CONFIG.log(AdventureUtils.tagResolver("option", key));
                 configuration.set(key, null);
-        }
+            }
 
         if (updated)
             try {
@@ -175,18 +186,6 @@ public class ConfigsManager {
             }
         return configuration;
     }
-
-    // Skip optional keys and subkeys
-    private final List<String> skippedYamlKeys =
-            List.of(
-                    "oraxen_inventory.menu_layout",
-                    "Misc.armor_equip_event_bypass"
-            );
-
-    private final List<String> removedYamlKeys =
-            List.of(
-                    "armorpotioneffects"
-            );
 
     public Collection<Glyph> parseGlyphConfigs() {
         List<File> glyphFiles = getGlyphFiles();

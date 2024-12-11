@@ -51,6 +51,10 @@ public class FurnitureListener implements Listener {
         if (PluginUtils.isEnabled("ProtocolLib")) BreakerSystem.MODIFIERS.add(getHardnessModifier());
     }
 
+    private static boolean isDamagingProjectile(Projectile projectile) {
+        return projectile instanceof AbstractArrow || projectile instanceof Fireball;
+    }
+
     private HardnessModifier getHardnessModifier() {
         return new HardnessModifier() {
 
@@ -120,8 +124,8 @@ public class FurnitureListener implements Listener {
                     .count() >= amount) event.setCancelled(true);
         } else if (limitedPlacing.getType() == LimitedPlacing.LimitedPlacingType.ALLOW)
             if (!limitedPlacing.checkLimitedMechanic(belowPlaced)) event.setCancelled(true);
-        else if (limitedPlacing.getType() == LimitedPlacing.LimitedPlacingType.DENY)
-            if (limitedPlacing.checkLimitedMechanic(belowPlaced)) event.setCancelled(true);
+            else if (limitedPlacing.getType() == LimitedPlacing.LimitedPlacingType.DENY)
+                if (limitedPlacing.checkLimitedMechanic(belowPlaced)) event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
@@ -181,7 +185,8 @@ public class FurnitureListener implements Listener {
         if (!player.getGameMode().equals(GameMode.CREATIVE))
             item.setAmount(item.getAmount() - 1);
         event.setUseInteractedBlock(Event.Result.DENY);
-        if (VersionUtil.isPaperServer()) baseEntity.getWorld().sendGameEvent(player, GameEvent.BLOCK_PLACE, baseEntity.getLocation().toVector());
+        if (VersionUtil.isPaperServer())
+            baseEntity.getWorld().sendGameEvent(player, GameEvent.BLOCK_PLACE, baseEntity.getLocation().toVector());
     }
 
     private Block getTarget(Block placedAgainst, BlockFace blockFace) {
@@ -200,7 +205,8 @@ public class FurnitureListener implements Listener {
     private FurnitureMechanic getMechanic(ItemStack item, Player player, Block placed) {
         final String itemID = OraxenItems.getIdByItem(item);
         if (placed == null || itemID == null) return null;
-        if (FurnitureFactory.getInstance().isNotImplementedIn(itemID) || BlockHelpers.isStandingInside(player, placed)) return null;
+        if (FurnitureFactory.getInstance().isNotImplementedIn(itemID) || BlockHelpers.isStandingInside(player, placed))
+            return null;
         if (!ProtectionLib.canBuild(player, placed.getLocation())) return null;
         if (OraxenFurniture.isFurniture(placed)) return null;
 
@@ -266,7 +272,8 @@ public class FurnitureListener implements Listener {
         OraxenFurnitureBreakEvent furnitureBreakEvent = new OraxenFurnitureBreakEvent(mechanic, baseEntity, player, block);
         if (!EventUtils.callEvent(furnitureBreakEvent)) return;
         // If successfully removed, un-cancel the event
-        if (OraxenFurniture.remove(block.getLocation(), player, furnitureBreakEvent.getDrop())) event.setCancelled(false);
+        if (OraxenFurniture.remove(block.getLocation(), player, furnitureBreakEvent.getDrop()))
+            event.setCancelled(false);
         event.setDropItems(false);
     }
 
@@ -303,10 +310,6 @@ public class FurnitureListener implements Listener {
         if (player != null && !ProtectionLib.canBreak(player, furniture.getLocation())) return;
 
         OraxenFurniture.remove(furniture, player);
-    }
-
-    private static boolean isDamagingProjectile(Projectile projectile) {
-        return projectile instanceof AbstractArrow || projectile instanceof Fireball;
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

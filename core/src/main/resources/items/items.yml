@@ -27,11 +27,11 @@ example_sword:
     # - generate one here: https://www.uuidgenerator.net/
     # - slot: HAND, OFF_HAND, FEET, LEGS, CHEST or HEAD
     - {
-        attribute: GENERIC_MOVEMENT_SPEED,
-        amount: 0.1,
-        operation: 0,
-        slot: HAND,
-      }
+      attribute: GENERIC_MOVEMENT_SPEED,
+      amount: 0.1,
+      operation: 0,
+      slot: HAND,
+    }
 
   Enchantments:
     protection: 4
@@ -83,13 +83,13 @@ example_potion:
     # - particles: true/false, whether this effect has particles or not
     # - icon: true/false, whether this effect has an icon or not
     - {
-        type: wither,
-        duration: 200,
-        amplifier: 2,
-        ambient: false,
-        particles: true,
-        icon: true,
-      }
+      type: wither,
+      duration: 200,
+      amplifier: 2,
+      ambient: false,
+      particles: true,
+      icon: true,
+    }
 
 miner_sandwitch:
   displayname: "<gradient:#F69D84:#FAD98D>Miner's sandwitch"

@@ -19,30 +19,6 @@ public class AtlasGenerator {
     public AtlasGenerator() {
     }
 
-    private static class TexturePath {
-        public final String namespace;
-        public final String path;
-
-        public TexturePath(String namespace, String path) {
-            this.namespace = namespace;
-            this.path = path.replace(".png", "");
-        }
-
-        public TexturePath(String path) {
-            this.namespace = path.contains(":") ? StringUtils.substringBefore(path, ":") : "minecraft";
-            this.path = (path.contains(":") ? path.split(":")[1] : path).replace(".png", "");
-        }
-
-        public String toPath() {
-            return namespace + ":" + path;
-        }
-
-        public boolean in(Collection<TexturePath> texturePaths) {
-            return texturePaths.stream()
-                    .anyMatch(texturePath -> namespace.equals(texturePath.namespace) && path.equals(texturePath.path));
-        }
-    }
-
     public static void generateAtlasFile(List<VirtualFile> output, Set<String> malformedTextures) {
         Logs.logSuccess("Generating atlas-file for 1.19.3+ Resource Pack format");
         if (Settings.EXCLUDE_MALFORMED_ATLAS.toBool() && !malformedTextures.isEmpty())
@@ -52,12 +28,12 @@ public class AtlasGenerator {
         JsonArray atlasContent = new JsonArray();
         LinkedHashMap<VirtualFile, TexturePath> textureSubFolders = new LinkedHashMap<>();
         for (VirtualFile v : output.stream().filter(v -> v.getPath().split("/").length > 3
-                && v.getPath().split("/")[2].equals("textures")
-                && v.getPath().endsWith(".png")
-                && !v.getPath().endsWith("_layer_1.png")
-                && !v.getPath().endsWith("_layer_2.png")
-                && PackSlicer.INPUTS.stream().noneMatch(input -> v.getPath().endsWith(input.path))
-                && PackSlicer.OUTPUT_PATHS.stream().noneMatch(outPath -> v.getPath().endsWith(outPath))).sorted()
+                        && v.getPath().split("/")[2].equals("textures")
+                        && v.getPath().endsWith(".png")
+                        && !v.getPath().endsWith("_layer_1.png")
+                        && !v.getPath().endsWith("_layer_2.png")
+                        && PackSlicer.INPUTS.stream().noneMatch(input -> v.getPath().endsWith(input.path))
+                        && PackSlicer.OUTPUT_PATHS.stream().noneMatch(outPath -> v.getPath().endsWith(outPath))).sorted()
                 .collect(Collectors.toCollection(LinkedHashSet::new))) {
             textureSubFolders.put(v, new TexturePath(StringUtils.substringBetween(v.getPath(), "assets/", "/textures"),
                     StringUtils.substringAfter(v.getPath(), "textures/")));
@@ -143,6 +119,30 @@ public class AtlasGenerator {
                 }
             });
             remove.forEach(atlasContent::remove);
+        }
+    }
+
+    private static class TexturePath {
+        public final String namespace;
+        public final String path;
+
+        public TexturePath(String namespace, String path) {
+            this.namespace = namespace;
+            this.path = path.replace(".png", "");
+        }
+
+        public TexturePath(String path) {
+            this.namespace = path.contains(":") ? StringUtils.substringBefore(path, ":") : "minecraft";
+            this.path = (path.contains(":") ? path.split(":")[1] : path).replace(".png", "");
+        }
+
+        public String toPath() {
+            return namespace + ":" + path;
+        }
+
+        public boolean in(Collection<TexturePath> texturePaths) {
+            return texturePaths.stream()
+                    .anyMatch(texturePath -> namespace.equals(texturePath.namespace) && path.equals(texturePath.path));
         }
     }
 }

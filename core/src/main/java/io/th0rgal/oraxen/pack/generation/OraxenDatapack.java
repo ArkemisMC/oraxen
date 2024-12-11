@@ -1,16 +1,13 @@
 package io.th0rgal.oraxen.pack.generation;
 
-import io.th0rgal.oraxen.utils.VirtualFile;
+import com.google.gson.JsonObject;
 import io.th0rgal.oraxen.utils.VersionUtil;
-
+import io.th0rgal.oraxen.utils.VirtualFile;
+import net.kyori.adventure.key.Key;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.packs.DataPack;
-
-import com.google.gson.JsonObject;
-
-import net.kyori.adventure.key.Key;
 
 import java.io.File;
 import java.io.IOException;

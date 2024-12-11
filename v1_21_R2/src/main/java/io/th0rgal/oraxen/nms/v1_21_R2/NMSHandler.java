@@ -72,6 +72,7 @@ import java.util.stream.Collectors;
 public class NMSHandler implements io.th0rgal.oraxen.nms.NMSHandler {
 
     private final GlyphHandler glyphHandler;
+    private final Map<ResourceLocation, IntList> tagRegistryMap = new HashMap();//createTagRegistryMap();
 
     public NMSHandler() {
         this.glyphHandler = new io.th0rgal.oraxen.nms.v1_21_R2.GlyphHandler();
@@ -112,7 +113,6 @@ public class NMSHandler implements io.th0rgal.oraxen.nms.NMSHandler {
     public boolean noteblockUpdatesDisabled() {
         return VersionUtil.isPaperServer() && GlobalConfiguration.get().blockUpdates.disableNoteblockUpdates;
     }
-
 
     @Override //TODO Fix this
     public ItemStack copyItemNBTTags(@NotNull ItemStack oldItem, @NotNull ItemStack newItem) {
@@ -212,8 +212,6 @@ public class NMSHandler implements io.th0rgal.oraxen.nms.NMSHandler {
         }
         return null;
     }
-
-    private final Map<ResourceLocation, IntList> tagRegistryMap = new HashMap();//createTagRegistryMap();
 
     /*private static Map<ResourceLocation, IntList> createTagRegistryMap() {
         return BuiltInRegistries.BLOCK.getTags().map(pair -> {

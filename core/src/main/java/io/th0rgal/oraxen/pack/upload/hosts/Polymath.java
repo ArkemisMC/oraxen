@@ -3,15 +3,15 @@ package io.th0rgal.oraxen.pack.upload.hosts;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import io.lumine.mythic.bukkit.utils.lib.http.HttpEntity;
+import io.lumine.mythic.bukkit.utils.lib.http.client.methods.CloseableHttpResponse;
+import io.lumine.mythic.bukkit.utils.lib.http.client.methods.HttpPost;
+import io.lumine.mythic.bukkit.utils.lib.http.entity.mime.MultipartEntityBuilder;
+import io.lumine.mythic.bukkit.utils.lib.http.impl.client.CloseableHttpClient;
+import io.lumine.mythic.bukkit.utils.lib.http.impl.client.HttpClients;
+import io.lumine.mythic.bukkit.utils.lib.http.util.EntityUtils;
 import io.th0rgal.oraxen.config.Settings;
 import io.th0rgal.oraxen.utils.logs.Logs;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class Polymath implements HostingProvider {
 
     @Override
     public boolean uploadPack(File resourcePack) {
-        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost request = new HttpPost(serverAddress + "upload");
 
             HttpEntity httpEntity = MultipartEntityBuilder
@@ -63,7 +63,7 @@ public class Polymath implements HostingProvider {
             Logs.logError("Response: " + jsonOutput);
             Logs.logError("The resource pack has not been uploaded to the server. Usually this is due to an excessive size.");
             return false;
-        } catch(IllegalStateException | IOException ex) {
+        } catch (IllegalStateException | IOException ex) {
             Logs.logError("The resource pack has not been uploaded to the server. Usually this is due to an excessive size.");
             ex.printStackTrace();
             return false;

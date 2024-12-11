@@ -16,7 +16,7 @@ public class ConsumablePotionEffectsListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onItemConsumed(PlayerItemConsumeEvent event) {
-        ItemStack item = event.getItem()  ;
+        ItemStack item = event.getItem();
         String itemID = OraxenItems.getIdByItem(item);
         if (!factory.isNotImplementedIn(itemID)) {
             ConsumablePotionEffectsMechanic mechanic = (ConsumablePotionEffectsMechanic) factory.getMechanic(itemID);

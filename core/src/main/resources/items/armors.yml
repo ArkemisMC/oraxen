@@ -26,11 +26,11 @@ emerald_helmet:
     - { attribute: GENERIC_MAX_HEALTH, amount: 2, operation: 0, slot: HEAD }
     - { attribute: GENERIC_ARMOR, amount: 3, operation: 0, slot: HEAD }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: HEAD,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: HEAD,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -54,11 +54,11 @@ emerald_chestplate:
     - { attribute: GENERIC_MAX_HEALTH, amount: 3, operation: 0, slot: CHEST }
     - { attribute: GENERIC_ARMOR, amount: 8, operation: 0, slot: CHEST }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: CHEST,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: CHEST,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -82,11 +82,11 @@ emerald_leggings:
     - { attribute: GENERIC_MAX_HEALTH, amount: 3, operation: 0, slot: LEGS }
     - { attribute: GENERIC_ARMOR, amount: 6, operation: 0, slot: LEGS }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: LEGS,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: LEGS,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -110,11 +110,11 @@ emerald_boots:
     - { attribute: GENERIC_MAX_HEALTH, amount: 2, operation: 0, slot: FEET }
     - { attribute: GENERIC_ARMOR, amount: 3, operation: 0, slot: FEET }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: FEET,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: FEET,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -220,11 +220,11 @@ ruby_helmet:
   AttributeModifiers:
     - { attribute: GENERIC_ARMOR, amount: 3, operation: 0, slot: HEAD }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: HEAD,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: HEAD,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -245,11 +245,11 @@ ruby_chestplate:
   AttributeModifiers:
     - { attribute: GENERIC_ARMOR, amount: 8, operation: 0, slot: CHEST }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: CHEST,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: CHEST,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -270,11 +270,11 @@ ruby_leggings:
   AttributeModifiers:
     - { attribute: GENERIC_ARMOR, amount: 6, operation: 0, slot: LEGS }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: LEGS,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: LEGS,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"
@@ -295,11 +295,11 @@ ruby_boots:
   AttributeModifiers:
     - { attribute: GENERIC_ARMOR, amount: 3, operation: 0, slot: FEET }
     - {
-        attribute: GENERIC_ARMOR_TOUGHNESS,
-        amount: 2,
-        operation: 0,
-        slot: FEET,
-      }
+      attribute: GENERIC_ARMOR_TOUGHNESS,
+      amount: 2,
+      operation: 0,
+      slot: FEET,
+    }
   Pack:
     generate_model: true
     parent_model: "item/generated"

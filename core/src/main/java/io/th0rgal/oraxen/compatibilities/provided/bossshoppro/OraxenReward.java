@@ -32,14 +32,14 @@ public class OraxenReward extends BSRewardType {
     @Override
     @SuppressWarnings("unchecked")
     public boolean canBuy(Player player, BSBuy bsBuy, boolean messageIfNoSuccess, Object reward,
-        ClickType clickType) {
+                          ClickType clickType) {
         if (!ClassManager.manager.getSettings().getInventoryFullDropItems()) {
             List<ItemStack> items = (List<ItemStack>) reward;
             if (!ClassManager.manager.getItemStackChecker().hasFreeSpace(player, items)) {
                 if (messageIfNoSuccess) {
                     ClassManager.manager
-                        .getMessageHandler()
-                        .sendMessage("Main.InventoryFull", player, null, player, bsBuy.getShop(), null, bsBuy);
+                            .getMessageHandler()
+                            .sendMessage("Main.InventoryFull", player, null, player, bsBuy.getShop(), null, bsBuy);
                 }
                 return false;
             }
@@ -56,8 +56,8 @@ public class OraxenReward extends BSRewardType {
             for (ItemStack itemStack : itemStacks)
                 if (itemStack.getType() != Material.AIR)
                     ClassManager.manager
-                        .getItemStackCreator()
-                        .giveItem(player, bsBuy, itemStack, itemStack.getAmount(), true);
+                            .getItemStackCreator()
+                            .giveItem(player, bsBuy, itemStack, itemStack.getAmount(), true);
         }
     }
 
@@ -65,14 +65,14 @@ public class OraxenReward extends BSRewardType {
     @SuppressWarnings("unchecked")
     public String getDisplayReward(Player player, BSBuy bsBuy, Object reward, ClickType clickType) {
         String itemsFormatted = ClassManager.manager
-            .getItemStackTranslator()
-            .getFriendlyText((List<ItemStack>) reward);
+                .getItemStackTranslator()
+                .getFriendlyText((List<ItemStack>) reward);
         return ClassManager.manager.getMessageHandler().get("Display.Item").replace("%items%", itemsFormatted);
     }
 
     @Override
     public String[] createNames() {
-        return new String[] { "oraxen", "oraxen-item", "item-oraxen" };
+        return new String[]{"oraxen", "oraxen-item", "item-oraxen"};
     }
 
     @Override

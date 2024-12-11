@@ -42,134 +42,41 @@ import java.util.zip.ZipInputStream;
 
 public class ResourcePack {
 
-    private final Map<String, Collection<Consumer<File>>> packModifiers;
+    private static final File packFolder = new File(OraxenPlugin.get().getDataFolder(), "pack");
+    private static final Set<String> availableLanguageCodes = new HashSet<>(Arrays.asList(
+            "af_za", "ar_sa", "ast_es", "az_az", "ba_ru",
+            "bar", "be_by", "bg_bg", "br_fr", "brb", "bs_ba", "ca_es", "cs_cz",
+            "cy_gb", "da_dk", "de_at", "de_ch", "de_de", "el_gr", "en_au", "en_ca",
+            "en_gb", "en_nz", "en_pt", "en_ud", "en_us", "enp", "enws", "eo_uy",
+            "es_ar", "es_cl", "es_ec", "es_es", "es_mx", "es_uy", "es_ve", "esan",
+            "et_ee", "eu_es", "fa_ir", "fi_fi", "fil_ph", "fo_fo", "fr_ca", "fr_fr",
+            "fra_de", "fur_it", "fy_nl", "ga_ie", "gd_gb", "gl_es", "haw_us", "he_il",
+            "hi_in", "hr_hr", "hu_hu", "hy_am", "id_id", "ig_ng", "io_en", "is_is",
+            "isv", "it_it", "ja_jp", "jbo_en", "ka_ge", "kk_kz", "kn_in", "ko_kr",
+            "ksh", "kw_gb", "la_la", "lb_lu", "li_li", "lmo", "lol_us", "lt_lt",
+            "lv_lv", "lzh", "mk_mk", "mn_mn", "ms_my", "mt_mt", "nah", "nds_de",
+            "nl_be", "nl_nl", "nn_no", "no_no", "oc_fr", "ovd", "pl_pl", "pt_br",
+            "pt_pt", "qya_aa", "ro_ro", "rpr", "ru_ru", "ry_ua", "se_no", "sk_sk",
+            "sl_si", "so_so", "sq_al", "sr_sp", "sv_se", "sxu", "szl", "ta_in",
+            "th_th", "tl_ph", "tlh_aa", "tok", "tr_tr", "tt_ru", "uk_ua", "val_es",
+            "vec_it", "vi_vn", "yi_de", "yo_ng", "zh_cn", "zh_hk", "zh_tw", "zlm_arab"));
     private static Map<String, VirtualFile> outputFiles;
+    private final Map<String, Collection<Consumer<File>>> packModifiers;
+    private final File pack = new File(packFolder, packFolder.getName() + ".zip");
+    private final boolean extractAssets = !new File(packFolder, "assets").exists();
+    private final boolean extractModels = !new File(packFolder, "models").exists();
+    private final boolean extractFonts = !new File(packFolder, "font").exists();
+    private final boolean extractOptifine = !new File(packFolder, "optifine").exists();
+    private final boolean extractLang = !new File(packFolder, "lang").exists();
+    private final boolean extractTextures = !new File(packFolder, "textures").exists();
+    private final boolean extractSounds = !new File(packFolder, "sounds").exists();
     private ShaderArmorTextures shaderArmorTextures;
     private TrimArmorDatapack trimArmorDatapack;
     private ComponentArmorModels componentArmorModels;
-    private static final File packFolder = new File(OraxenPlugin.get().getDataFolder(), "pack");
-    private final File pack = new File(packFolder, packFolder.getName() + ".zip");
-
     public ResourcePack() {
         // we use maps to avoid duplicate
         packModifiers = new HashMap<>();
         outputFiles = new HashMap<>();
-    }
-
-    public void generate() {
-        outputFiles.clear();
-
-        makeDirsIfNotExists(packFolder, new File(packFolder, "assets"));
-
-        componentArmorModels = CustomArmorType.getSetting() == CustomArmorType.COMPONENT ? new ComponentArmorModels()
-                : null;
-        trimArmorDatapack = CustomArmorType.getSetting() == CustomArmorType.TRIMS ? new TrimArmorDatapack() : null;
-        shaderArmorTextures = CustomArmorType.getSetting() == CustomArmorType.SHADER ? new ShaderArmorTextures() : null;
-
-        if (Settings.GENERATE_DEFAULT_ASSETS.toBool())
-            extractDefaultFolders();
-        extractRequired();
-
-        if (!Settings.GENERATE.toBool())
-            return;
-
-        if (Settings.HIDE_SCOREBOARD_NUMBERS.toBool() && PluginUtils.isEnabled("HappyHUD")) {
-            Logs.logError("HappyHUD detected with hide_scoreboard_numbers enabled!");
-            Logs.logWarning(
-                    "Recommend following this guide for compatibility: https://docs.oraxen.com/compatibility/happyhud");
-        }
-
-        try {
-            Files.deleteIfExists(pack.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        extractInPackIfNotExists(new File(packFolder, "pack.mcmeta"));
-        extractInPackIfNotExists(new File(packFolder, "pack.png"));
-
-        // Sorting items to keep only one with models (and generate it if needed)
-        generatePredicates(extractTexturedItems());
-        generateFont();
-        if (Settings.HIDE_SCOREBOARD_NUMBERS.toBool())
-            hideScoreboardNumbers();
-        hideScoreboardOrTablistBackgrounds();
-        if (Settings.TEXTURE_SLICER.toBool())
-            PackSlicer.slicePackFiles();
-        if (CustomArmorType.getSetting() == CustomArmorType.SHADER
-                && Settings.CUSTOM_ARMOR_SHADER_GENERATE_FILES.toBool())
-            ShaderArmorTextures.generateArmorShaderFiles();
-
-        for (final Collection<Consumer<File>> packModifiers : packModifiers.values())
-            for (Consumer<File> packModifier : packModifiers)
-                packModifier.accept(packFolder);
-        List<VirtualFile> output = new ArrayList<>(outputFiles.values());
-
-        // zipping resourcepack
-        try {
-            // Adds all non-directory root files
-            getFilesInFolder(packFolder, output, packFolder.getCanonicalPath(), packFolder.getName() + ".zip");
-
-            // needs to be ordered, forEach cannot be used
-            File[] files = packFolder.listFiles();
-            if (files != null)
-                for (final File folder : files) {
-                    if (!folder.isDirectory())
-                        continue;
-                    getAllFiles(folder, output,
-                            folder.getName().matches("models|textures|lang|font|sounds") ? "assets/minecraft" : "");
-                }
-
-            // Convert the global.json within the lang-folder to all languages
-            convertGlobalLang(output);
-
-            // Handles generation of datapack & other files for custom armor
-            handleCustomArmor(output);
-
-            Collections.sort(output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Set<String> malformedTextures = new HashSet<>();
-        if (Settings.VERIFY_PACK_FILES.toBool())
-            malformedTextures = verifyPackFormatting(output);
-
-        if (Settings.GENERATE_ATLAS_FILE.toBool())
-            AtlasGenerator.generateAtlasFile(output, malformedTextures);
-
-        if (Settings.MERGE_DUPLICATE_FONTS.toBool())
-            DuplicationHandler.mergeFontFiles(output);
-        if (Settings.MERGE_ITEM_MODELS.toBool())
-            DuplicationHandler.mergeBaseItemFiles(output);
-
-        List<String> excludedExtensions = Settings.EXCLUDED_FILE_EXTENSIONS.toStringList();
-        excludedExtensions.removeIf(f -> f.equals("png") || f.equals("json"));
-        if (!excludedExtensions.isEmpty() && !output.isEmpty()) {
-            List<VirtualFile> newOutput = new ArrayList<>();
-            for (VirtualFile virtual : output)
-                for (String extension : excludedExtensions)
-                    if (virtual.getPath().endsWith(extension))
-                        newOutput.add(virtual);
-            output.removeAll(newOutput);
-        }
-
-        generateSound(output);
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(OraxenPlugin.get(), () -> {
-            OraxenPackGeneratedEvent event = new OraxenPackGeneratedEvent(output);
-            EventUtils.callEvent(event);
-            ZipUtils.writeZipFile(pack, event.getOutput());
-
-            UploadManager uploadManager = OraxenPlugin.get().getUploadManager();
-            if (uploadManager != null) { // If the uploadManager isnt null, this was triggered by a pack-reload
-                uploadManager.uploadAsyncAndSendToPlayers(OraxenPlugin.get().getResourcePack(), true, true);
-            } else { // Otherwise this is was triggered on server-startup
-                uploadManager = new UploadManager(OraxenPlugin.get());
-                OraxenPlugin.get().setUploadManager(uploadManager);
-                uploadManager.uploadAsyncAndSendToPlayers(OraxenPlugin.get().getResourcePack(), false, false);
-            }
-        });
     }
 
     private static Set<String> verifyPackFormatting(List<VirtualFile> output) {
@@ -293,13 +200,132 @@ public class ResourcePack {
         return "assets/" + namespace + "/textures/" + texturePath;
     }
 
-    private final boolean extractAssets = !new File(packFolder, "assets").exists();
-    private final boolean extractModels = !new File(packFolder, "models").exists();
-    private final boolean extractFonts = !new File(packFolder, "font").exists();
-    private final boolean extractOptifine = !new File(packFolder, "optifine").exists();
-    private final boolean extractLang = !new File(packFolder, "lang").exists();
-    private final boolean extractTextures = !new File(packFolder, "textures").exists();
-    private final boolean extractSounds = !new File(packFolder, "sounds").exists();
+    public static void addOutputFiles(final VirtualFile... files) {
+        for (VirtualFile file : files)
+            outputFiles.put(file.getPath(), file);
+    }
+
+    public static void writeStringToVirtual(String folder, String name, String content) {
+        folder = !folder.endsWith("/") ? folder : folder.substring(0, folder.length() - 1);
+        addOutputFiles(
+                new VirtualFile(folder, name, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
+    }
+
+    public void generate() {
+        outputFiles.clear();
+
+        makeDirsIfNotExists(packFolder, new File(packFolder, "assets"));
+
+        componentArmorModels = CustomArmorType.getSetting() == CustomArmorType.COMPONENT ? new ComponentArmorModels()
+                : null;
+        trimArmorDatapack = CustomArmorType.getSetting() == CustomArmorType.TRIMS ? new TrimArmorDatapack() : null;
+        shaderArmorTextures = CustomArmorType.getSetting() == CustomArmorType.SHADER ? new ShaderArmorTextures() : null;
+
+        if (Settings.GENERATE_DEFAULT_ASSETS.toBool())
+            extractDefaultFolders();
+        extractRequired();
+
+        if (!Settings.GENERATE.toBool())
+            return;
+
+        if (Settings.HIDE_SCOREBOARD_NUMBERS.toBool() && PluginUtils.isEnabled("HappyHUD")) {
+            Logs.logError("HappyHUD detected with hide_scoreboard_numbers enabled!");
+            Logs.logWarning(
+                    "Recommend following this guide for compatibility: https://docs.oraxen.com/compatibility/happyhud");
+        }
+
+        try {
+            Files.deleteIfExists(pack.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        extractInPackIfNotExists(new File(packFolder, "pack.mcmeta"));
+        extractInPackIfNotExists(new File(packFolder, "pack.png"));
+
+        // Sorting items to keep only one with models (and generate it if needed)
+        generatePredicates(extractTexturedItems());
+        generateFont();
+        if (Settings.HIDE_SCOREBOARD_NUMBERS.toBool())
+            hideScoreboardNumbers();
+        hideScoreboardOrTablistBackgrounds();
+        if (Settings.TEXTURE_SLICER.toBool())
+            PackSlicer.slicePackFiles();
+        if (CustomArmorType.getSetting() == CustomArmorType.SHADER
+                && Settings.CUSTOM_ARMOR_SHADER_GENERATE_FILES.toBool())
+            ShaderArmorTextures.generateArmorShaderFiles();
+
+        for (final Collection<Consumer<File>> packModifiers : packModifiers.values())
+            for (Consumer<File> packModifier : packModifiers)
+                packModifier.accept(packFolder);
+        List<VirtualFile> output = new ArrayList<>(outputFiles.values());
+
+        // zipping resourcepack
+        try {
+            // Adds all non-directory root files
+            getFilesInFolder(packFolder, output, packFolder.getCanonicalPath(), packFolder.getName() + ".zip");
+
+            // needs to be ordered, forEach cannot be used
+            File[] files = packFolder.listFiles();
+            if (files != null)
+                for (final File folder : files) {
+                    if (!folder.isDirectory())
+                        continue;
+                    getAllFiles(folder, output,
+                            folder.getName().matches("models|textures|lang|font|sounds") ? "assets/minecraft" : "");
+                }
+
+            // Convert the global.json within the lang-folder to all languages
+            convertGlobalLang(output);
+
+            // Handles generation of datapack & other files for custom armor
+            handleCustomArmor(output);
+
+            Collections.sort(output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Set<String> malformedTextures = new HashSet<>();
+        if (Settings.VERIFY_PACK_FILES.toBool())
+            malformedTextures = verifyPackFormatting(output);
+
+        if (Settings.GENERATE_ATLAS_FILE.toBool())
+            AtlasGenerator.generateAtlasFile(output, malformedTextures);
+
+        if (Settings.MERGE_DUPLICATE_FONTS.toBool())
+            DuplicationHandler.mergeFontFiles(output);
+        if (Settings.MERGE_ITEM_MODELS.toBool())
+            DuplicationHandler.mergeBaseItemFiles(output);
+
+        List<String> excludedExtensions = Settings.EXCLUDED_FILE_EXTENSIONS.toStringList();
+        excludedExtensions.removeIf(f -> f.equals("png") || f.equals("json"));
+        if (!excludedExtensions.isEmpty() && !output.isEmpty()) {
+            List<VirtualFile> newOutput = new ArrayList<>();
+            for (VirtualFile virtual : output)
+                for (String extension : excludedExtensions)
+                    if (virtual.getPath().endsWith(extension))
+                        newOutput.add(virtual);
+            output.removeAll(newOutput);
+        }
+
+        generateSound(output);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(OraxenPlugin.get(), () -> {
+            OraxenPackGeneratedEvent event = new OraxenPackGeneratedEvent(output);
+            EventUtils.callEvent(event);
+            ZipUtils.writeZipFile(pack, event.getOutput());
+
+            UploadManager uploadManager = OraxenPlugin.get().getUploadManager();
+            if (uploadManager != null) { // If the uploadManager isnt null, this was triggered by a pack-reload
+                uploadManager.uploadAsyncAndSendToPlayers(OraxenPlugin.get().getResourcePack(), true, true);
+            } else { // Otherwise this is was triggered on server-startup
+                uploadManager = new UploadManager(OraxenPlugin.get());
+                OraxenPlugin.get().setUploadManager(uploadManager);
+                uploadManager.uploadAsyncAndSendToPlayers(OraxenPlugin.get().getResourcePack(), false, false);
+            }
+        });
+    }
 
     private void extractDefaultFolders() {
         final ZipInputStream zip = ResourcesManager.browse();
@@ -397,11 +423,6 @@ public class ResourcePack {
     @SafeVarargs
     public final void addModifiers(String groupName, final Consumer<File>... modifiers) {
         packModifiers.put(groupName, Arrays.asList(modifiers));
-    }
-
-    public static void addOutputFiles(final VirtualFile... files) {
-        for (VirtualFile file : files)
-            outputFiles.put(file.getPath(), file);
     }
 
     public File getFile() {
@@ -548,12 +569,6 @@ public class ResourcePack {
                 s.getName().equals("required.stone"));
 
         return sounds;
-    }
-
-    public static void writeStringToVirtual(String folder, String name, String content) {
-        folder = !folder.endsWith("/") ? folder : folder.substring(0, folder.length() - 1);
-        addOutputFiles(
-                new VirtualFile(folder, name, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
     }
 
     private void getAllFiles(File dir, Collection<VirtualFile> fileList, String newFolder, String... excluded) {
@@ -717,24 +732,6 @@ public class ResourcePack {
         output.addAll(virtualLangFiles);
     }
 
-    private static final Set<String> availableLanguageCodes = new HashSet<>(Arrays.asList(
-            "af_za", "ar_sa", "ast_es", "az_az", "ba_ru",
-            "bar", "be_by", "bg_bg", "br_fr", "brb", "bs_ba", "ca_es", "cs_cz",
-            "cy_gb", "da_dk", "de_at", "de_ch", "de_de", "el_gr", "en_au", "en_ca",
-            "en_gb", "en_nz", "en_pt", "en_ud", "en_us", "enp", "enws", "eo_uy",
-            "es_ar", "es_cl", "es_ec", "es_es", "es_mx", "es_uy", "es_ve", "esan",
-            "et_ee", "eu_es", "fa_ir", "fi_fi", "fil_ph", "fo_fo", "fr_ca", "fr_fr",
-            "fra_de", "fur_it", "fy_nl", "ga_ie", "gd_gb", "gl_es", "haw_us", "he_il",
-            "hi_in", "hr_hr", "hu_hu", "hy_am", "id_id", "ig_ng", "io_en", "is_is",
-            "isv", "it_it", "ja_jp", "jbo_en", "ka_ge", "kk_kz", "kn_in", "ko_kr",
-            "ksh", "kw_gb", "la_la", "lb_lu", "li_li", "lmo", "lol_us", "lt_lt",
-            "lv_lv", "lzh", "mk_mk", "mn_mn", "ms_my", "mt_mt", "nah", "nds_de",
-            "nl_be", "nl_nl", "nn_no", "no_no", "oc_fr", "ovd", "pl_pl", "pt_br",
-            "pt_pt", "qya_aa", "ro_ro", "rpr", "ru_ru", "ry_ua", "se_no", "sk_sk",
-            "sl_si", "so_so", "sq_al", "sr_sp", "sv_se", "sxu", "szl", "ta_in",
-            "th_th", "tl_ph", "tlh_aa", "tok", "tr_tr", "tt_ru", "uk_ua", "val_es",
-            "vec_it", "vi_vn", "yi_de", "yo_ng", "zh_cn", "zh_hk", "zh_tw", "zlm_arab"));
-
     private void hideScoreboardNumbers() {
         if (PluginUtils.isEnabled("ProtocolLib") && VersionUtil.isPaperServer() && VersionUtil.atOrAbove("1.20.3")) {
             ProtocolLibrary.getProtocolManager().addPacketListener(new ScoreboardPacketListener());
@@ -761,30 +758,30 @@ public class ResourcePack {
     private String getScoreboardVsh() {
         return """
                 #version 150
-
+                
                 in vec3 Position;
                 in vec4 Color;
                 in vec2 UV0;
                 in ivec2 UV2;
-
+                
                 uniform sampler2D Sampler2;
-
+                
                 uniform mat4 ModelViewMat;
                 uniform mat4 ProjMat;
-
+                
                 uniform vec2 ScreenSize;
-
+                
                 out float vertexDistance;
                 out vec4 vertexColor;
                 out vec2 texCoord0;
-
+                
                 void main() {
                     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
-
+                
                     vertexDistance = length((ModelViewMat * vec4(Position, 1.0)).xyz);
                     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
                     texCoord0 = UV0;
-
+                
                 	// delete sidebar numbers
                 	if(	Position.z == 0.0 && // check if the depth is correct (0 for gui texts)
                 			gl_Position.x >= 0.95 && gl_Position.y >= -0.35 && // check if the position matches the sidebar
@@ -832,20 +829,20 @@ public class ResourcePack {
         if (VersionUtil.atOrAbove("1.21"))
             return """
                     #version 150
-
+                    
                      in vec3 Position;
                      in vec4 Color;
-
+                    
                      uniform mat4 ModelViewMat;
                      uniform mat4 ProjMat;
-
+                    
                      out vec4 vertexColor;
-
+                    
                      void main() {
                      	gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
-
+                    
                      	vertexColor = Color;
-
+                    
                      	//Isolating Scoreboard Display
                      	// Mojang Changed the Z position in 1.21, idk exact value but its huge
                      	if(gl_Position.y > -0.5 && gl_Position.y < 0.85 && gl_Position.x > 0.0 && gl_Position.x <= 1.0 && Position.z > 1000.0 && Position.z < 2750.0) {
@@ -855,31 +852,31 @@ public class ResourcePack {
                      	else {
                          	//vertexColor = vec4(vec3(1.0,0.0,0.0),1.0);
                      	}
-
+                    
                      	// Uncomment this if you want to make LIST invisible
                      	if(Position.z > 2750.0 && Position.z < 3000.0) {
                      		//TABLIST.a = 0.0;
                      	}
                      }
-
+                    
                     """;
         else if (VersionUtil.atOrAbove("1.21"))
             return """
                     #version 150
-
+                    
                     in vec3 Position;
                     in vec4 Color;
-
+                    
                     uniform mat4 ModelViewMat;
                     uniform mat4 ProjMat;
-
+                    
                     out vec4 vertexColor;
-
+                    
                     void main() {
                     	gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
-
+                    
                     	vertexColor = Color;
-
+                    
                     	//Isolating Scoreboard Display
                     	if(gl_Position.y > -0.5 && gl_Position.y < 0.85 && gl_Position.x > 0.0 && gl_Position.x <= 1.0 && Position.z == 0.0) {
                     		//vertexColor = vec4(vec3(0.0,0.0,1.0),1.0); // Debugger
@@ -893,31 +890,31 @@ public class ResourcePack {
         else
             return """
                     #version 150
-
+                    
                     in vec4 vertexColor;
-
+                    
                     uniform vec4 ColorModulator;
-
+                    
                     out vec4 fragColor;
-
+                    
                     bool isgray(vec4 a) {
                         return a.r == 0 && a.g == 0 && a.b == 0 && a.a < 0.3 && a.a > 0.29;
                     }
-
+                    
                     bool isdarkgray(vec4 a) {
                     	return a.r == 0 && a.g == 0 && a.b == 0 && a.a == 0.4;
                     }
-
+                    
                     void main() {
-
+                    
                         vec4 color = vertexColor;
-
+                    
                         if (color.a == 0.0) {
                             discard;
                         }
-
+                    
                         fragColor = color * ColorModulator;
-
+                    
                     	if(isgray(fragColor)){
                     		discard;
                     	}

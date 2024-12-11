@@ -10,13 +10,13 @@ import org.bukkit.inventory.ItemStack;
 
 public class StonecuttingBuilder extends RecipeBuilder {
 
+    public StonecuttingBuilder(Player player) {
+        super(player, "stonecutting");
+    }
+
     @Override
     Inventory createInventory(Player player, String inventoryTitle) {
         return Bukkit.createInventory(player, InventoryType.WORKBENCH, "<glyph:recipe_stonecutter>");
-    }
-
-    public StonecuttingBuilder(Player player) {
-        super(player, "stonecutting");
     }
 
     @Override

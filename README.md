@@ -45,8 +45,10 @@ increase oraxen features.
 - Handle configuration errors
 
 ## Contributing
+
 If you want to contribute to Oraxen, you can do so by creating a pull request.\
 You should make a pull-request to the `develop` branch.
+
 1. Fork Oraxen on GitHub
 2. Clone your forked repository (`git clone`)
 3. Create your feature branch (`git checkout -b my-feature`)
@@ -59,23 +61,30 @@ You should make a pull-request to the `develop` branch.
 ## API
 
 Oraxen's API is primarily found in these four classes:
+
 - OraxenItems - methods related to Oraxen items
 - OraxenBlocks - methods related to custom blocks in Oraxen
 - OraxenFurniture - methods related to custom furniture in Oraxen
 - OraxenPack - methods related to the resource-pack
 
 ### Repository
+
 **Gradle Kotlin**:
+
 ```kts
 maven("https://repo.oraxen.com/releases")
 ```
+
 **Groovy**:
+
 ```groovy
 maven {
     url "https://repo.oraxen.com/releases"
 }
 ```
+
 **Maven**
+
 ```html
 <repository>
   <id>oraxen</id>
@@ -83,16 +92,22 @@ maven {
   <url>https://repo.oraxen.com/releases</url>
 </repository>
 ```
+
 ### Dependency [![version](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.oraxen.com/releases/io/th0rgal/oraxen/maven-metadata.xml)](https://repo.oraxen.com/#/releases/io/th0rgal/oraxen) [![version](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.oraxen.com/snapshots/io/th0rgal/oraxen/maven-metadata.xml)](https://repo.oraxen.com/#/snapshots/io/th0rgal/oraxen)
+
 The latest version can be found at above.\
 **Gradle Kotlin**:
+
 ```kts
 compileOnly("io.th0rgal:oraxen:VERSION")
 ```
+
 **Groovy**:
+
 ```groovy
 compileOnly 'io.th0rgal:oraxen:VERSION'
 ```
+
 **Maven**
 <details open>
 <summary>Maven with exclusions</summary>
@@ -151,6 +166,7 @@ compileOnly 'io.th0rgal:oraxen:VERSION'
     <scope>provided</scope>
 </dependency>
 ```
+
 </details>
 
 Snapshot builds are also available at [https://repo.oraxen.com/snapshots](https://repo.oraxen.com/snapshots).

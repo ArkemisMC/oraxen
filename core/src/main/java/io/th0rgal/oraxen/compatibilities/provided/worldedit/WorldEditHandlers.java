@@ -36,6 +36,16 @@ import java.util.*;
 public class WorldEditHandlers {
 
 
+    private static final List<com.sk89q.worldedit.world.entity.EntityType> furnitureTypes = new ArrayList<>();
+
+    static {
+        furnitureTypes.add(BukkitAdapter.adapt(EntityType.ITEM_FRAME));
+        if (VersionUtil.atOrAbove("1.19.4")) {
+            furnitureTypes.add(BukkitAdapter.adapt(EntityType.ITEM_DISPLAY));
+            furnitureTypes.add(BukkitAdapter.adapt(EntityType.INTERACTION));
+        }
+    }
+
     public WorldEditHandlers(boolean register) {
         if (register) {
             WorldEdit.getInstance().getEventBus().register(this);
@@ -43,17 +53,6 @@ public class WorldEditHandlers {
             WorldEdit.getInstance().getEventBus().unregister(this);
         }
     }
-
-    private static final List<com.sk89q.worldedit.world.entity.EntityType> furnitureTypes = new ArrayList<>();
-
-    static {
-        furnitureTypes.add(BukkitAdapter.adapt(EntityType.ITEM_FRAME));
-        if (VersionUtil.atOrAbove("1.19.4")){
-            furnitureTypes.add(BukkitAdapter.adapt(EntityType.ITEM_DISPLAY));
-            furnitureTypes.add(BukkitAdapter.adapt(EntityType.INTERACTION));
-        }
-    }
-
 
     @Subscribe
     public void onEditSession(EditSessionEvent event) {
@@ -64,7 +63,8 @@ public class WorldEditHandlers {
             @Override
             public Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity baseEntity) {
                 if (!Settings.WORLDEDIT_FURNITURE.toBool()) return super.createEntity(location, baseEntity);
-                if (baseEntity == null || baseEntity.getType() == BukkitAdapter.adapt(EntityType.INTERACTION)) return null;
+                if (baseEntity == null || baseEntity.getType() == BukkitAdapter.adapt(EntityType.INTERACTION))
+                    return null;
                 if (!baseEntity.hasNbtData() || !furnitureTypes.contains(baseEntity.getType()))
                     return super.createEntity(location, baseEntity);
 

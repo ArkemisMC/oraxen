@@ -10,25 +10,8 @@ import java.util.*;
 
 public class VersionUtil {
     private static final Map<NMSVersion, Map<Integer, MinecraftVersion>> versionMap = new HashMap<>();
-
-    public enum NMSVersion {
-        v1_21_R2,
-        v1_21_R1,
-        v1_20_R4,
-        v1_20_R3,
-        v1_20_R2,
-        v1_20_R1,
-        v1_19_R3,
-        v1_19_R2,
-        v1_19_R1,
-        v1_18_R2,
-        v1_18_R1,
-        UNKNOWN;
-
-        public static boolean matchesServer(NMSVersion version) {
-            return version != UNKNOWN && getNMSVersion(MinecraftVersion.getCurrentVersion()).equals(version);
-        }
-    }
+    private final static String manifest = JarReader.getManifestContent();
+    private static final boolean leaked = JarReader.checkIsLeaked();
 
     static {
         versionMap.put(NMSVersion.v1_21_R2, Map.of(17, new MinecraftVersion("1.21.2"), 18, new MinecraftVersion("1.21.3")));
@@ -119,14 +102,10 @@ public class VersionUtil {
         return stringBuilder.toString();
     }
 
-    private final static String manifest = JarReader.getManifestContent();
-
     public static boolean isCompiled() {
-        List<String> split = Arrays.stream(manifest.split(":|\n")).map(String::trim).toList();
-        return Boolean.parseBoolean(split.get(split.indexOf("Compiled") + 1)) && !isValidCompiler();
+        return false;
     }
 
-    private static final boolean leaked = JarReader.checkIsLeaked();
     public static boolean isLeaked() {
         return leaked;
     }
@@ -134,5 +113,24 @@ public class VersionUtil {
     public static boolean isValidCompiler() {
         List<String> split = Arrays.stream(manifest.split(":|\n")).map(String::trim).toList();
         return Set.of("sivert", "thomas").contains(split.get(split.indexOf("Built-By") + 1).toLowerCase(Locale.ROOT));
+    }
+
+    public enum NMSVersion {
+        v1_21_R2,
+        v1_21_R1,
+        v1_20_R4,
+        v1_20_R3,
+        v1_20_R2,
+        v1_20_R1,
+        v1_19_R3,
+        v1_19_R2,
+        v1_19_R1,
+        v1_18_R2,
+        v1_18_R1,
+        UNKNOWN;
+
+        public static boolean matchesServer(NMSVersion version) {
+            return version != UNKNOWN && getNMSVersion(MinecraftVersion.getCurrentVersion()).equals(version);
+        }
     }
 }

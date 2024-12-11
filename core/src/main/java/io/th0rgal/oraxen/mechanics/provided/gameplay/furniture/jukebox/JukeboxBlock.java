@@ -15,11 +15,11 @@ import static io.th0rgal.oraxen.mechanics.provided.misc.music_disc.MusicDiscList
 
 public class JukeboxBlock {
 
+    public final String active_stage;
     private final MechanicFactory factory;
     private final String permission;
     private final double volume;
     private final double pitch;
-    public final String active_stage;
 
     public JukeboxBlock(MechanicFactory factory, ConfigurationSection section) {
         this.factory = factory;
@@ -36,9 +36,9 @@ public class JukeboxBlock {
         MusicDiscMechanic mechanic = (MusicDiscMechanic) factory.getMechanic(OraxenItems.getIdByItem(disc));
         return (mechanic != null && !mechanic.hasNoSong()) ? mechanic.getSong()
                 : disc.getType().isRecord()
-                        ? disc.getType().toString().toLowerCase(Locale.ROOT).replace("music_disc_",
-                                "minecraft:music_disc.")
-                        : null;
+                ? disc.getType().toString().toLowerCase(Locale.ROOT).replace("music_disc_",
+                "minecraft:music_disc.")
+                : null;
     }
 
     public String getPermission() {

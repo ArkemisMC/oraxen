@@ -30,21 +30,21 @@ public class ReportCommand {
 
                     // Format report
                     String report = String.format("""
-
-                            ### System Report
-                            **Plugin Versions:**
-                            - Oraxen: %s
-                            - ProtocolLib: %s
-
-                            **Server Information:**
-                            - Software: %s
-                            - Version: %s
-
-                            **System Information:**
-                            - OS: %s
-                            - OS Version: %s
-                            - Architecture: %s
-                            """,
+                                    
+                                    ### System Report
+                                    **Plugin Versions:**
+                                    - Oraxen: %s
+                                    - ProtocolLib: %s
+                                    
+                                    **Server Information:**
+                                    - Software: %s
+                                    - Version: %s
+                                    
+                                    **System Information:**
+                                    - OS: %s
+                                    - OS Version: %s
+                                    - Architecture: %s
+                                    """,
                             oraxenVersion,
                             protocolLibVersion,
                             serverSoftware,

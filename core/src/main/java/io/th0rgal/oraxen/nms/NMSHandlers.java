@@ -48,6 +48,7 @@ public class NMSHandlers {
             }
         }
     }
+
     public static boolean isTripwireUpdatesDisabled() {
         return handler != null && handler.tripwireUpdatesDisabled();
     }

@@ -25,12 +25,6 @@ public class CustomSound {
     // Jukebox data as an Optional record
     private final Optional<JukeboxData> jukeboxData;
 
-    private record JukeboxData(
-            Component description,
-            int lengthInSeconds,
-            int comparatorOutput) {
-    }
-
     public CustomSound(@NotNull String name, @NotNull ConfigurationSection config) {
         this.name = name;
 
@@ -54,7 +48,7 @@ public class CustomSound {
         // (1.183.0 or older),
         this.category = categoryStr != null
                 ? categoryStr.toUpperCase(Locale.ROOT).equals("RECORD") ? SoundCategory.RECORDS
-                        : SoundCategory.valueOf(categoryStr.toUpperCase(Locale.ROOT))
+                : SoundCategory.valueOf(categoryStr.toUpperCase(Locale.ROOT))
                 : SoundCategory.MASTER;
 
         this.subtitle = config.getString("subtitle");
@@ -84,7 +78,7 @@ public class CustomSound {
     }
 
     public void play(@NotNull Player player, @NotNull Location location, @NotNull SoundCategory category, float volume,
-            float pitch) {
+                     float pitch) {
         player.playSound(location, name, category, volume, pitch);
     }
 
@@ -186,5 +180,11 @@ public class CustomSound {
         songJson.addProperty("comparator_output", getComparatorOutput());
 
         return songJson;
+    }
+
+    private record JukeboxData(
+            Component description,
+            int lengthInSeconds,
+            int comparatorOutput) {
     }
 }

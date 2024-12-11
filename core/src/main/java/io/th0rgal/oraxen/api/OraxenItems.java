@@ -146,7 +146,7 @@ public class OraxenItems {
 
     public static List<ItemStack> getItemStacksByName(final List<List<String>> lists) {
         return lists.stream().flatMap(list -> {
-            final ItemStack[] itemStack = new ItemStack[] { new ItemStack(Material.AIR) };
+            final ItemStack[] itemStack = new ItemStack[]{new ItemStack(Material.AIR)};
             list.stream().map(line -> line.split(":")).forEach(param -> {
                 switch (param[0].toLowerCase(Locale.ROOT)) {
                     case "type" -> {

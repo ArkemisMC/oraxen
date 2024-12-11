@@ -12,10 +12,15 @@ import org.bukkit.inventory.ItemStack;
 public class MiscMechanicFactory extends MechanicFactory {
 
     private static MiscMechanicFactory instance;
+
     public MiscMechanicFactory(ConfigurationSection section) {
         super(section);
         MechanicsManager.registerListeners(OraxenPlugin.get(), getMechanicID(), new MiscListener(this));
         instance = this;
+    }
+
+    public static MiscMechanicFactory get() {
+        return instance;
     }
 
     @Override
@@ -34,10 +39,6 @@ public class MiscMechanicFactory extends MechanicFactory {
 
         addToImplemented(mechanic);
         return mechanic;
-    }
-
-    public static MiscMechanicFactory get() {
-        return instance;
     }
 
     @Override

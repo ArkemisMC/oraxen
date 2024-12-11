@@ -51,8 +51,8 @@ import java.util.Map.Entry;
 
 public class MechanicsManager {
 
-    private static final Map<String, MechanicFactory> FACTORIES_BY_MECHANIC_ID = new HashMap<>();
     public static final Map<String, List<Integer>> MECHANIC_TASKS = new HashMap<>();
+    private static final Map<String, MechanicFactory> FACTORIES_BY_MECHANIC_ID = new HashMap<>();
     private static final Map<String, List<Listener>> MECHANICS_LISTENERS = new HashMap<>();
 
     public static void registerNativeMechanics() {

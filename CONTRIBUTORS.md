@@ -6,13 +6,15 @@
 
 > Developers who have contributed to the source code
 
-* [Boy0000](https://github.com/Boy0000): Maintained the plugin until end of 2024, responsible for adding several mechanics, fixing bugs, and improving the code quality.
+* [Boy0000](https://github.com/Boy0000): Maintained the plugin until end of 2024, responsible for adding several
+  mechanics, fixing bugs, and improving the code quality.
 * [AntoineJT](https://github.com/AntoineJT): made great refactors.
 * [yzl210](https://github.com/yzl210): active contributor, introduced mythicmobs support, shapeless+furnace recipes and
   much more
 * [Lauriichan](https://github.com/Lauriichan): did a great job with the recipes, commands and multiple refactors
 * [Brett Saunders](https://github.com/brettsaunders21): introduced an awesome display inventory for recipes
-* [Euphyllia](https://github.com/Euphillya): multiple improvements (worked on recipes and fixed bugs) and work on Folia Support
+* [Euphyllia](https://github.com/Euphillya): multiple improvements (worked on recipes and fixed bugs) and work on Folia
+  Support
 * [Karlatemp](https://github.com/Karlatemp): added support for external hosting providers
 * [Auxilor](https://github.com/Auxilor): fixed jitpack configuration
 * [MrMicky](https://github.com/MrMicky-FR): developer of [FastInv](https://github.com/MrMicky-FR/FastInv) (used in this
@@ -22,7 +24,8 @@
 
 ### Early supporters
 
-> Users who bought the plugin during its beta (version 0.x) and decided to trust me and support the project while it was not yet finished.
+> Users who bought the plugin during its beta (version 0.x) and decided to trust me and support the project while it was
+> not yet finished.
 
 1. [arturek1666](https://www.spigotmc.org/members/arturek1666.172791/)
 2. [zebulun](https://www.spigotmc.org/members/zebulun.298908/)

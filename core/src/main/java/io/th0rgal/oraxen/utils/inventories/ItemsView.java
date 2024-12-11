@@ -121,10 +121,6 @@ public class ItemsView {
         return gui;
     }
 
-    private record GuiItemSlot(ItemStack itemStack, Integer slot) {
-
-    }
-
     private GuiItemSlot getGuiItemSlot(final File file) {
         ItemStack itemStack;
         String fileName = Utils.removeExtension(file.getName());
@@ -140,5 +136,9 @@ public class ItemsView {
         if (itemStack == null) itemStack = new ItemBuilder(Material.PAPER).setDisplayName(displayName).build();
         int slot = settings.getInt(String.format("oraxen_inventory.menu_layout.%s.slot", Utils.removeExtension(file.getName())), 0) - 1;
         return new GuiItemSlot(itemStack, slot);
+    }
+
+    private record GuiItemSlot(ItemStack itemStack, Integer slot) {
+
     }
 }

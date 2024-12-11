@@ -125,6 +125,7 @@ public class CustomArmorListener implements Listener {
             armorMeta.setTrim(new ArmorTrim(TrimMaterial.REDSTONE, vanillaPattern));
             armorMeta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
             itemStack.setItemMeta(armorMeta);
-        } else if (vanillaPattern == null && Settings.DEBUG.toBool()) Logs.logWarning("Vanilla trim-pattern not found for " + itemStack.getType().name() + ": " + vanillaPatternKey.asString());
+        } else if (vanillaPattern == null && Settings.DEBUG.toBool())
+            Logs.logWarning("Vanilla trim-pattern not found for " + itemStack.getType().name() + ": " + vanillaPatternKey.asString());
     }
 }

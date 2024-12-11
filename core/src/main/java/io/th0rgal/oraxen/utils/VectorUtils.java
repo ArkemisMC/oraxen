@@ -4,7 +4,8 @@ import org.bukkit.util.Vector;
 
 public class VectorUtils {
 
-    private VectorUtils() {}
+    private VectorUtils() {
+    }
 
     public static void rotateAroundAxisX(Vector v, double angle) {
         double cos = Math.cos(angle);

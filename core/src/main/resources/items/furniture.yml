@@ -108,9 +108,9 @@ shelf:
         floor: false
         wall: true
         type: DENY
-        block_types: []
-        block_tags: []
-        oraxen_blocks: []
+        block_types: [ ]
+        block_tags: [ ]
+        oraxen_blocks: [ ]
       barrier: false
       drop:
         silktouch: false

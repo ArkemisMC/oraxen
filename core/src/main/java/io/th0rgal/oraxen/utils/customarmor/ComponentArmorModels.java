@@ -65,7 +65,8 @@ public class ComponentArmorModels {
             String armorPrefix = StringUtils.substringBeforeLast(itemId, "_");
             EquipmentSlot slot = slotFromItem(itemId);
 
-            if (!armorPrefixes.contains(armorPrefix) || skippedArmorType.contains(armorPrefix) || slot == null) continue;
+            if (!armorPrefixes.contains(armorPrefix) || skippedArmorType.contains(armorPrefix) || slot == null)
+                continue;
             if (itemStack == null || !itemStack.hasItemMeta()) continue;
 
             if (!itemBuilder.hasEquippableComponent() || itemBuilder.getEquippableComponent().getModel() == null) {

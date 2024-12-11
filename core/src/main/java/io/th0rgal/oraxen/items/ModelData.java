@@ -8,9 +8,9 @@ import java.util.*;
 public class ModelData {
 
     public static final int STARTING_CMD = 1000;
+    public static final Map<Material, Map<String, Integer>> DATAS = new HashMap<>();
     private final Material type;
     private final int modelData;
-    public static final Map<Material, Map<String, Integer>> DATAS = new HashMap<>();
 
     public ModelData(Material type, String model, int modelData) {
         this.type = type;
@@ -18,14 +18,6 @@ public class ModelData {
         Map<String, Integer> usedModelDatas = DATAS.getOrDefault(type, new HashMap<>());
         usedModelDatas.put(model, modelData);
         DATAS.put(type, usedModelDatas);
-    }
-
-    public Material getType() {
-        return type;
-    }
-
-    public int getModelData() {
-        return modelData;
     }
 
     public static int generateId(String model, Material type) {
@@ -79,5 +71,13 @@ public class ModelData {
             } else skippedCustomModelData.add(Integer.parseInt(s));
         }
         return skippedCustomModelData;
+    }
+
+    public Material getType() {
+        return type;
+    }
+
+    public int getModelData() {
+        return modelData;
     }
 }

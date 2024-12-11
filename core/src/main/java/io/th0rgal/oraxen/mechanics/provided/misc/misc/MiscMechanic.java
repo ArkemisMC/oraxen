@@ -34,13 +34,35 @@ public class MiscMechanic extends Mechanic {
         }
     }
 
-    public boolean breaksFromCactus() { return cactusBreaks; }
-    public boolean burnsInFire() { return burnsInFire; }
-    public boolean burnsInLava() { return burnsInLava; }
-    public boolean isVanillaInteractionDisabled() { return disableVanillaInteractions; }
-    public boolean canStripLogs() { return canStripLogs; }
-    public boolean piglinIgnoreWhenEquipped() { return piglinsIgnoreWhenEquipped; }
-    public boolean isCompostable() { return compostable; }
+    public boolean breaksFromCactus() {
+        return cactusBreaks;
+    }
 
-    public boolean isAllowedInVanillaRecipes() { return allowInVanillaRecipes; }
+    public boolean burnsInFire() {
+        return burnsInFire;
+    }
+
+    public boolean burnsInLava() {
+        return burnsInLava;
+    }
+
+    public boolean isVanillaInteractionDisabled() {
+        return disableVanillaInteractions;
+    }
+
+    public boolean canStripLogs() {
+        return canStripLogs;
+    }
+
+    public boolean piglinIgnoreWhenEquipped() {
+        return piglinsIgnoreWhenEquipped;
+    }
+
+    public boolean isCompostable() {
+        return compostable;
+    }
+
+    public boolean isAllowedInVanillaRecipes() {
+        return allowInVanillaRecipes;
+    }
 }

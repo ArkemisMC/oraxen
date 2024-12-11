@@ -45,6 +45,18 @@ import static org.bukkit.block.data.FaceAttachable.AttachedFace.FLOOR;
 
 public class BlockHelpers {
 
+    public static final Set<Material> UNBREAKABLE_BLOCKS = Sets.newHashSet(Material.BEDROCK, Material.BARRIER, Material.NETHER_PORTAL, Material.END_PORTAL_FRAME, Material.END_PORTAL, Material.END_GATEWAY);
+    public static final List<Material> REPLACEABLE_BLOCKS;
+
+    static {
+        if (VersionUtil.atOrAbove("1.19")) UNBREAKABLE_BLOCKS.add(Material.REINFORCED_DEEPSLATE);
+        if (VersionUtil.atOrAbove("1.20")) {
+            REPLACEABLE_BLOCKS = Tag.REPLACEABLE.getValues().stream().toList();
+        } else REPLACEABLE_BLOCKS = Arrays.asList(
+                Material.SNOW, Material.VINE, Material.valueOf("GRASS"), Material.TALL_GRASS, Material.SEAGRASS, Material.FERN,
+                Material.LARGE_FERN, Material.AIR, Material.WATER, Material.LAVA, Material.LIGHT);
+    }
+
     /**
      * Returns the block the entity is standing on.<br>
      * Mainly to handle cases where player is on the edge of a block, with AIR below them
@@ -86,7 +98,7 @@ public class BlockHelpers {
         if (sound.startsWith("block.wood") && mechanics.getBoolean("noteblock_and_block")) {
             return sound.replace("block.wood", "required.wood");
         } else if (sound.startsWith("block.stone") && mechanics.getBoolean("stringblock_and_furniture")) {
-                return sound.replace("block.stone", "required.stone");
+            return sound.replace("block.stone", "required.stone");
         } else return sound;
     }
 
@@ -107,7 +119,7 @@ public class BlockHelpers {
     }
 
     public static Location toCenterBlockLocation(Location location) {
-        return toCenterLocation(location).subtract(0,0.5,0);
+        return toCenterLocation(location).subtract(0, 0.5, 0);
     }
 
     public static boolean isStandingInside(final Player player, final Block block) {
@@ -121,33 +133,24 @@ public class BlockHelpers {
                 .toList().isEmpty();
     }
 
-    /** Returns the PersistentDataContainer from CustomBlockData
+    /**
+     * Returns the PersistentDataContainer from CustomBlockData
+     *
      * @param block The block to get the PersistentDataContainer for
-     * */
+     */
     public static PersistentDataContainer getPDC(Block block) {
         return getPDC(block, OraxenPlugin.get());
     }
 
-    /** Returns the PersistentDataContainer from CustomBlockData
-     * @param block The block to get the PersistentDataContainer for
+    /**
+     * Returns the PersistentDataContainer from CustomBlockData
+     *
+     * @param block  The block to get the PersistentDataContainer for
      * @param plugin The plugin to get the CustomBlockData from
-     * */
+     */
     public static PersistentDataContainer getPDC(Block block, JavaPlugin plugin) {
         return new CustomBlockData(block, plugin);
     }
-
-    public static final Set<Material> UNBREAKABLE_BLOCKS = Sets.newHashSet(Material.BEDROCK, Material.BARRIER, Material.NETHER_PORTAL, Material.END_PORTAL_FRAME, Material.END_PORTAL, Material.END_GATEWAY);
-
-    static {
-        if (VersionUtil.atOrAbove("1.19")) UNBREAKABLE_BLOCKS.add(Material.REINFORCED_DEEPSLATE);
-        if (VersionUtil.atOrAbove("1.20")) {
-            REPLACEABLE_BLOCKS = Tag.REPLACEABLE.getValues().stream().toList();
-        } else REPLACEABLE_BLOCKS = Arrays.asList(
-                Material.SNOW, Material.VINE, Material.valueOf("GRASS"), Material.TALL_GRASS, Material.SEAGRASS, Material.FERN,
-                Material.LARGE_FERN, Material.AIR, Material.WATER, Material.LAVA, Material.LIGHT);
-    }
-
-    public static final List<Material> REPLACEABLE_BLOCKS;
 
     public static boolean isReplaceable(Block block) {
         return REPLACEABLE_BLOCKS.contains(block.getType());
@@ -184,16 +187,6 @@ public class BlockHelpers {
         };
     }
 
-    public enum BlockCorrection {
-        NMS, LEGACY;
-
-        public static boolean useNMS() {
-            return get() == NMS;
-        }
-        public static BlockCorrection get() {
-            return Objects.equals(Settings.BLOCK_CORRECTION.toString(), "NMS") ? NMS : LEGACY;
-        }
-    }
     public static void correctAllBlockStates(Block placedAgainst, Player player, EquipmentSlot hand, BlockFace face, ItemStack item, BlockData newData) {
         Block target = placedAgainst.getRelative(face);
         BlockData correctedData;
@@ -202,8 +195,7 @@ public class BlockHelpers {
             // thus causing a StackOverflow, find a workaround
             if (Tag.ITEMS_BOATS.isTagged(item.getType())) return;
             NMSHandlers.getHandler().correctBlockStates(player, hand, item);
-        }
-        else {
+        } else {
             if (newData == null) return;
             // If not using NMS-method, the BlockData needs to be set beforehand
             BlockData oldData = target.getBlockData();
@@ -230,16 +222,23 @@ public class BlockHelpers {
         if (type == Material.HANGING_ROOTS && face != BlockFace.DOWN) return null;
         if (type.toString().endsWith("TORCH") && face == BlockFace.DOWN) return null;
         if (type.toString().endsWith("HANGING_SIGN") && face == BlockFace.UP) return null;
-        if (((state instanceof Sign && !type.toString().endsWith("HANGING_SIGN")) || state instanceof Banner) && face == BlockFace.DOWN) return null;
+        if (((state instanceof Sign && !type.toString().endsWith("HANGING_SIGN")) || state instanceof Banner) && face == BlockFace.DOWN)
+            return null;
         if (data instanceof Ageable) return !handleAgeableBlocks(block, face) ? data : null;
-        if (!(data instanceof Door) && (data instanceof Bisected || data instanceof Slab)) handleHalfBlocks(block, player);
+        if (!(data instanceof Door) && (data instanceof Bisected || data instanceof Slab))
+            handleHalfBlocks(block, player);
         if (data instanceof Rotatable) handleRotatableBlocks(block, player);
-        if (type.toString().contains("CORAL") && !type.toString().endsWith("CORAL_BLOCK") && face == BlockFace.DOWN) return null;
-        if (type.toString().endsWith("CORAL") && block.getRelative(BlockFace.DOWN).getType() == Material.AIR) return null;
-        if (type.toString().endsWith("_CORAL_FAN") && face != BlockFace.UP) block.setType(Material.valueOf(type.toString().replace("_CORAL_FAN", "_CORAL_WALL_FAN")));
+        if (type.toString().contains("CORAL") && !type.toString().endsWith("CORAL_BLOCK") && face == BlockFace.DOWN)
+            return null;
+        if (type.toString().endsWith("CORAL") && block.getRelative(BlockFace.DOWN).getType() == Material.AIR)
+            return null;
+        if (type.toString().endsWith("_CORAL_FAN") && face != BlockFace.UP)
+            block.setType(Material.valueOf(type.toString().replace("_CORAL_FAN", "_CORAL_WALL_FAN")));
         if (data instanceof Waterlogged) handleWaterlogged(block, face);
-        if ((data instanceof Bed || data instanceof Chest || data instanceof Bisected) && !(data instanceof Stairs) && !(data instanceof TrapDoor)) if (!handleDoubleBlocks(block, player)) return null;
-        if ((state instanceof Skull || state instanceof Sign || state instanceof Banner || type.toString().contains("TORCH")) && face != BlockFace.DOWN && face != BlockFace.UP) handleWallAttachable(block, face);
+        if ((data instanceof Bed || data instanceof Chest || data instanceof Bisected) && !(data instanceof Stairs) && !(data instanceof TrapDoor))
+            if (!handleDoubleBlocks(block, player)) return null;
+        if ((state instanceof Skull || state instanceof Sign || state instanceof Banner || type.toString().contains("TORCH")) && face != BlockFace.DOWN && face != BlockFace.UP)
+            handleWallAttachable(block, face);
 
         if (!(data instanceof Stairs) && !type.toString().endsWith("HANGING_SIGN") && (data instanceof Directional || data instanceof FaceAttachable || data instanceof MultipleFacing || data instanceof Attachable)) {
             if (!(data instanceof SculkVein) && data instanceof MultipleFacing && face == BlockFace.UP) return null;
@@ -528,6 +527,18 @@ public class BlockHelpers {
 
     public static boolean isLoaded(Location loc) {
         return loc.getWorld() != null && isLoaded(loc.getWorld(), loc);
+    }
+
+    public enum BlockCorrection {
+        NMS, LEGACY;
+
+        public static boolean useNMS() {
+            return get() == NMS;
+        }
+
+        public static BlockCorrection get() {
+            return Objects.equals(Settings.BLOCK_CORRECTION.toString(), "NMS") ? NMS : LEGACY;
+        }
     }
 
 }

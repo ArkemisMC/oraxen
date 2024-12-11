@@ -26,7 +26,7 @@ WorldEdit: # Please note these are both experimental still and should be used wi
 ConfigsTools:
   # list of model data numbers the automatic system will skip
   # List can take ranges like 1-4 as well as normal singular numbers
-  skipped_model_data_numbers: []
+  skipped_model_data_numbers: [ ]
   disable_automatic_model_data: false
   disable_automatic_glyph_code: false
   enable_configs_updater: true
@@ -83,7 +83,7 @@ Pack:
   generation:
     generate: true # Unlike Plugin.generation.default_assets, this will enable/disable all pack generation
     # List of file extensions that will not be included in the final zipped ResourcePack
-    excluded_file_extensions: []
+    excluded_file_extensions: [ ]
     verify_pack_files: true # Checks all textures and models to make sure they abide by valid Resourcepack formatting
     fix_force_unicode_glyphs: true # Fixes glyphs not being shown when Force Unicode is enabled
     texture_slicer: true # Slices default-texture overrides into new 1.20.2 format
@@ -156,9 +156,9 @@ Pack:
           content: "<#55ffa4><bold>ResourcePack loaded"
         # If you need to send commands
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     accepted:
       actions:
@@ -169,9 +169,9 @@ Pack:
           content: "<#55ffa4><bold>ResourcePack accepted"
         # If you need to send commands
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     denied:
       actions:
@@ -183,9 +183,9 @@ Pack:
           content: "<red>You refused the ResourcePack, but you need it in order to see the new items. Please </red><click:run_command:'/oraxen pack send @p'><hover:show_text:'<green>Display more informations'><green><bold>CLICK HERE</bold></hover></click> <red>or type <bold>/oraxen pack send @p"
         # If you need to send commands
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     failed_download:
       actions:
@@ -197,37 +197,37 @@ Pack:
           content: "<red>You failed to download the ResourcePack, but you need it in order to see the new items. Please </red><click:run_command:'/oraxen pack send @p'><hover:show_text:'<red>! loading the resourcepack from the game can cause lags'><red><bold>CLICK HERE</bold></hover></click> <red>to retry or type <bold>/oraxen pack send @p</bold>"
         # If you need to send commands
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     failed_reload: #1.20.3+ only
       actions:
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     downloaded: #1.20.3+ only
       actions:
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     invalid_url: #1.20.3+ only
       actions:
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 
     discarded: #1.20.3+ only
       actions:
         commands:
-          console: []
-          player: []
-          opped_player: []
+          console: [ ]
+          player: [ ]
+          opped_player: [ ]
 Misc:
   # If this is set to true, Oraxen will reset recipes on reload. This might create conflicts with other plugins
   # but this makes the things easier if you want to try your oraxen recipes.

@@ -8,7 +8,8 @@ import org.bukkit.Bukkit;
 
 public class Logs {
 
-    private Logs() {}
+    private Logs() {
+    }
 
     public static void logInfo(String message) {
         if (!message.isEmpty()) logInfo(message, false);
@@ -50,10 +51,27 @@ public class Logs {
         OraxenPlugin.get().getAudience().console().sendMessage(Component.empty());
     }
 
-    public static void debug(Object object) { if ( Settings.DEBUG.toBool()) Bukkit.broadcastMessage(String.valueOf(object)); }
-    public static void debug(Object object, String prefix) { if ( Settings.DEBUG.toBool()) Bukkit.broadcastMessage(prefix + object); }
-    public static <T> T debugVal(T object) { if ( Settings.DEBUG.toBool()) Bukkit.broadcastMessage(String.valueOf(object)); return object; }
-    public static <T> T debugVal(T object, String prefix) { if ( Settings.DEBUG.toBool()) Bukkit.broadcastMessage(prefix + object); return object; }
-    public static void debug(Component component) { if ( Settings.DEBUG.toBool()) OraxenPlugin.get().getAudience().console().sendMessage(component != null ? component : Component.text("null")); }
+    public static void debug(Object object) {
+        if (Settings.DEBUG.toBool()) Bukkit.broadcastMessage(String.valueOf(object));
+    }
+
+    public static void debug(Object object, String prefix) {
+        if (Settings.DEBUG.toBool()) Bukkit.broadcastMessage(prefix + object);
+    }
+
+    public static <T> T debugVal(T object) {
+        if (Settings.DEBUG.toBool()) Bukkit.broadcastMessage(String.valueOf(object));
+        return object;
+    }
+
+    public static <T> T debugVal(T object, String prefix) {
+        if (Settings.DEBUG.toBool()) Bukkit.broadcastMessage(prefix + object);
+        return object;
+    }
+
+    public static void debug(Component component) {
+        if (Settings.DEBUG.toBool())
+            OraxenPlugin.get().getAudience().console().sendMessage(component != null ? component : Component.text("null"));
+    }
 
 }

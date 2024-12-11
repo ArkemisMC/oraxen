@@ -1,8 +1,6 @@
 package io.th0rgal.oraxen.utils;
 
 import io.th0rgal.oraxen.utils.drops.Drop;
-import io.th0rgal.oraxen.utils.logs.Logs;
-
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -109,9 +107,8 @@ public class ItemUtils {
     public static boolean isSkull(Material material) {
         return switch (material) {
             case PLAYER_HEAD, PLAYER_WALL_HEAD, SKELETON_SKULL, SKELETON_WALL_SKULL, WITHER_SKELETON_SKULL,
-                    WITHER_SKELETON_WALL_SKULL, ZOMBIE_HEAD, ZOMBIE_WALL_HEAD, CREEPER_HEAD, CREEPER_WALL_HEAD,
-                    DRAGON_HEAD, DRAGON_WALL_HEAD, PIGLIN_HEAD, PIGLIN_WALL_HEAD ->
-                true;
+                 WITHER_SKELETON_WALL_SKULL, ZOMBIE_HEAD, ZOMBIE_WALL_HEAD, CREEPER_HEAD, CREEPER_WALL_HEAD,
+                 DRAGON_HEAD, DRAGON_WALL_HEAD, PIGLIN_HEAD, PIGLIN_WALL_HEAD -> true;
             default -> false;
         };
     }

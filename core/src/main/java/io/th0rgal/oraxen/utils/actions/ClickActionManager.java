@@ -7,14 +7,13 @@ import io.th0rgal.oraxen.utils.actions.impl.message.ActionBarAction;
 import io.th0rgal.oraxen.utils.actions.impl.message.MessageAction;
 import io.th0rgal.oraxen.utils.actions.impl.other.SoundAction;
 import me.gabytm.util.actions.placeholders.PlaceholderProvider;
-import me.gabytm.util.actions.spigot.actions.SpigotActionManager;
 import me.gabytm.util.actions.spigot.placeholders.PlaceholderAPIProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class ClickActionManager extends SpigotActionManager {
+public class ClickActionManager extends me.gabytm.util.actions.spigot.actions.SpigotActionManager {
 
     public ClickActionManager(@NotNull JavaPlugin plugin) {
         super(plugin);

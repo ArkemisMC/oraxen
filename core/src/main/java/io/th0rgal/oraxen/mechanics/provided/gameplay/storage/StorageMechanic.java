@@ -32,11 +32,11 @@ import java.util.*;
 
 public class StorageMechanic {
 
+    public static final NamespacedKey STORAGE_KEY = new NamespacedKey(OraxenPlugin.get(), "storage");
+    public static final NamespacedKey PERSONAL_STORAGE_KEY = new NamespacedKey(OraxenPlugin.get(), "personal_storage");
     public static Set<Player> playerStorages = new HashSet<>();
     public static Map<Block, StorageGui> blockStorages = new HashMap<>();
     public static Map<Entity, StorageGui> frameStorages = new HashMap<>();
-    public static final NamespacedKey STORAGE_KEY = new NamespacedKey(OraxenPlugin.get(), "storage");
-    public static final NamespacedKey PERSONAL_STORAGE_KEY = new NamespacedKey(OraxenPlugin.get(), "personal_storage");
     private final int rows;
     private final String title;
     private final StorageType type;
@@ -57,10 +57,6 @@ public class StorageMechanic {
         closeAnimation = section.getString("close_animation", null);
         volume = (float) section.getDouble("volume", 0.5);
         pitch = (float) section.getDouble("pitch", 0.95f);
-    }
-
-    public enum StorageType {
-        STORAGE, PERSONAL, ENDERCHEST, DISPOSAL, SHULKER
     }
 
     public void openPersonalStorage(Player player, Location location, @Nullable Entity baseEntity) {
@@ -347,5 +343,9 @@ public class StorageMechanic {
         });
 
         return gui;
+    }
+
+    public enum StorageType {
+        STORAGE, PERSONAL, ENDERCHEST, DISPOSAL, SHULKER
     }
 }

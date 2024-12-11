@@ -35,7 +35,8 @@ public class HatMechanicListener implements Listener {
         if (!(event.getRightClicked() instanceof ArmorStand armorStand)) return;
         EntityEquipment equipment = armorStand.getEquipment();
         if (equipment.getHelmet() == null) return;
-        if (!EventUtils.callEvent(new PlayerArmorStandManipulateEvent(player, armorStand, item, equipment.getHelmet(), EquipmentSlot.HEAD, EquipmentSlot.HAND))) return;
+        if (!EventUtils.callEvent(new PlayerArmorStandManipulateEvent(player, armorStand, item, equipment.getHelmet(), EquipmentSlot.HEAD, EquipmentSlot.HAND)))
+            return;
 
         if (item.getType() == Material.AIR) {
             if (event.getClickedPosition().getY() < 1.55) return; // Did not click head

@@ -67,7 +67,8 @@ public class FurnitureSoundListener implements Listener {
             breakerPlaySound.remove(location);
         }
 
-        if (OraxenBlocks.isOraxenStringBlock(block) || block.getType() == Material.TRIPWIRE && mechanicBelow != null && mechanicBelow.isTall()) return;
+        if (OraxenBlocks.isOraxenStringBlock(block) || block.getType() == Material.TRIPWIRE && mechanicBelow != null && mechanicBelow.isTall())
+            return;
         if (block.getBlockData().getSoundGroup().getBreakSound() != Sound.BLOCK_STONE_BREAK) return;
         if (OraxenFurniture.isFurniture(block) && block.getType() == Material.BARRIER || block.isEmpty()) return;
 
@@ -113,7 +114,8 @@ public class FurnitureSoundListener implements Listener {
         SoundGroup soundGroup = blockStandingOn.getBlockData().getSoundGroup();
 
         if (soundGroup.getStepSound() != Sound.BLOCK_STONE_STEP) return;
-        if (gameEvent == GameEvent.HIT_GROUND && cause != null && cause.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+        if (gameEvent == GameEvent.HIT_GROUND && cause != null && cause.getCause() != EntityDamageEvent.DamageCause.FALL)
+            return;
         if (blockStandingOn.getType() == Material.TRIPWIRE) return;
         FurnitureMechanic mechanic = OraxenFurniture.getFurnitureMechanic(blockStandingOn);
 

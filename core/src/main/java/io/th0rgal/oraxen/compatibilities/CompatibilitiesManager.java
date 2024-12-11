@@ -15,10 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CompatibilitiesManager {
 
-    private CompatibilitiesManager() {}
-
     private static final ConcurrentHashMap<String, Class<? extends CompatibilityProvider<?>>> COMPATIBILITY_PROVIDERS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, CompatibilityProvider<?>> ACTIVE_COMPATIBILITY_PROVIDERS = new ConcurrentHashMap<>();
+    private CompatibilitiesManager() {
+    }
 
     public static void enableNativeCompatibilities() {
         WrappedWorldEdit.init();
@@ -48,7 +48,8 @@ public class CompatibilitiesManager {
                 Message.PLUGIN_HOOKS.log(AdventureUtils.tagResolver("plugin", pluginName));
                 return true;
             }
-        } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException |
+                       InvocationTargetException e) {
             e.printStackTrace();
             return false;
         }

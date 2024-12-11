@@ -67,16 +67,16 @@ noteblock:
   enabled: true
 
 stringblock:
-    tool_types:
-      - WOODEN
-      - STONE
-      - IRON
-      - GOLDEN
-      - DIAMOND
-      - NETHERITE
-    sapling_growth_check_delay: 4000
-    disable_vanilla_strings: false
-    enabled: true
+  tool_types:
+    - WOODEN
+    - STONE
+    - IRON
+    - GOLDEN
+    - DIAMOND
+    - NETHERITE
+  sapling_growth_check_delay: 4000
+  disable_vanilla_strings: false
+  enabled: true
 
 furniture:
   default_furniture_type: DISPLAY_ENTITY # DISPLAY_ENTITY, ITEM_FRAME, GLOW_ITEM_FRAME

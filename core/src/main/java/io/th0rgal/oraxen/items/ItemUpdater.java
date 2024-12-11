@@ -39,111 +39,9 @@ import static io.th0rgal.oraxen.items.ItemBuilder.UNSTACKABLE_KEY;
 
 public class ItemUpdater implements Listener {
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!Settings.UPDATE_ITEMS.toBool()) return;
-
-        PlayerInventory inventory = event.getPlayer().getInventory();
-        for (int i = 0; i < inventory.getSize(); i++) {
-            ItemStack oldItem = inventory.getItem(i);
-            ItemStack newItem = ItemUpdater.updateItem(oldItem);
-            if (oldItem == null || oldItem.equals(newItem)) continue;
-            inventory.setItem(i, newItem);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerPickUp(EntityPickupItemEvent event) {
-        if (!Settings.UPDATE_ITEMS.toBool()) return;
-        if (!(event.getEntity() instanceof Player)) return;
-
-        ItemStack oldItem = event.getItem().getItemStack();
-        ItemStack newItem = ItemUpdater.updateItem(oldItem);
-        if (oldItem.equals(newItem)) return;
-        event.getItem().setItemStack(newItem);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onItemEnchant(PrepareItemEnchantEvent event) {
-        String id = OraxenItems.getIdByItem(event.getItem());
-        ItemBuilder builder = OraxenItems.getItemById(id);
-        if (builder == null || !builder.hasOraxenMeta()) return;
-
-        if (builder.getOraxenMeta().isDisableEnchanting()) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onItemEnchant(PrepareAnvilEvent event) {
-        ItemStack item = event.getInventory().getItem(0);
-        ItemStack result = event.getResult();
-        String id = OraxenItems.getIdByItem(item);
-        ItemBuilder builder = OraxenItems.getItemById(id);
-        if (builder == null || !builder.hasOraxenMeta()) return;
-
-        if (builder.getOraxenMeta().isDisableEnchanting()) {
-            if (result == null || item == null) return;
-            if (!result.getEnchantments().equals(item.getEnchantments()))
-                event.setResult(null);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onUseMaxDamageItem(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        ItemStack itemStack = player.getInventory().getItemInMainHand();
-
-        if (!VersionUtil.atOrAbove("1.20.5") || player.getGameMode() == GameMode.CREATIVE) return;
-        if (ItemUtils.isEmpty(itemStack) || ItemUtils.isTool(itemStack)) return;
-        if (!(itemStack.getItemMeta() instanceof Damageable damageable) || !damageable.hasMaxDamage()) return;
-
-        Optional.ofNullable(OraxenItems.getBuilderByItem(itemStack)).ifPresent(i -> {
-                if (i.isDamagedOnBlockBreak()) itemStack.damage(1, player);
-        });
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onUseMaxDamageItem(EntityDamageByEntityEvent event) {
-        if (!VersionUtil.atOrAbove("1.20.5") || VersionUtil.atOrAbove("1.21.2")) return;
-        if (!(event.getDamager() instanceof LivingEntity entity)) return;
-        ItemStack itemStack = Optional.ofNullable(entity.getEquipment()).map(EntityEquipment::getItemInMainHand).orElse(null);
-
-        if (entity instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;
-        if (ItemUtils.isEmpty(itemStack) || ItemUtils.isTool(itemStack)) return;
-        if (!(itemStack.getItemMeta() instanceof Damageable damageable) || !damageable.hasMaxDamage()) return;
-
-        Optional.ofNullable(OraxenItems.getBuilderByItem(itemStack)).ifPresent(i -> {
-            if (i.isDamagedOnEntityHit()) itemStack.damage(1, entity);
-        });
-    }
-
-    // Until Paper changes getReplacement to use food-component, this is the best way
-    @EventHandler(ignoreCancelled = true)
-    public void onUseConvertedTo(PlayerItemConsumeEvent event) {
-        ItemStack itemStack = event.getItem();
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!VersionUtil.atOrAbove("1.21") && itemMeta == null) return;
-        ItemStack usingConvertsTo = ItemUtils.getUsingConvertsTo(itemMeta);
-        if (usingConvertsTo == null || !itemStack.isSimilar(ItemUpdater.updateItem(usingConvertsTo))) return;
-
-        PlayerInventory inventory = event.getPlayer().getInventory();
-        if (inventory.firstEmpty() == -1) event.setItem(event.getItem().add(usingConvertsTo.getAmount()));
-        else Bukkit.getScheduler().runTask(OraxenPlugin.get(), () -> {
-            for (int i = 0; i < inventory.getSize(); i++) {
-                ItemStack oldItem = inventory.getItem(i);
-                ItemStack newItem = ItemUpdater.updateItem(oldItem);
-                if (!itemStack.isSimilar(newItem)) continue;
-
-                // Remove the item and add it to fix stacking
-                inventory.setItem(i, null);
-                inventory.addItem(newItem);
-            }
-        });
-    }
-
     private static final NamespacedKey IF_UUID = Objects.requireNonNull(NamespacedKey.fromString("oraxen:if-uuid"));
     private static final NamespacedKey MF_GUI = Objects.requireNonNull(NamespacedKey.fromString("oraxen:mf-gui"));
+
     public static ItemStack updateItem(ItemStack oldItem) {
         String id = OraxenItems.getIdByItem(oldItem);
         if (id == null) return oldItem;
@@ -205,8 +103,8 @@ public class ItemUpdater implements Listener {
             if (itemMeta instanceof LeatherArmorMeta leatherMeta && oldMeta instanceof LeatherArmorMeta oldLeatherMeta && newMeta instanceof LeatherArmorMeta newLeatherMeta) {
                 // If it is not custom armor, keep color
                 if (oldItem.getType() == Material.LEATHER_HORSE_ARMOR) leatherMeta.setColor(oldLeatherMeta.getColor());
-                // If it is custom armor we use newLeatherMeta color, since the builder would have been altered
-                // in the process of creating the shader images. Then we just save the builder to update the config
+                    // If it is custom armor we use newLeatherMeta color, since the builder would have been altered
+                    // in the process of creating the shader images. Then we just save the builder to update the config
                 else {
                     leatherMeta.setColor(newLeatherMeta.getColor());
                     newItemBuilder.save();
@@ -229,8 +127,10 @@ public class ItemUpdater implements Listener {
                 if (newMeta.hasFood()) itemMeta.setFood(newMeta.getFood());
                 else if (oldMeta.hasFood()) itemMeta.setFood(oldMeta.getFood());
 
-                if (newMeta.hasEnchantmentGlintOverride()) itemMeta.setEnchantmentGlintOverride(newMeta.getEnchantmentGlintOverride());
-                else if (oldMeta.hasEnchantmentGlintOverride()) itemMeta.setEnchantmentGlintOverride(oldMeta.getEnchantmentGlintOverride());
+                if (newMeta.hasEnchantmentGlintOverride())
+                    itemMeta.setEnchantmentGlintOverride(newMeta.getEnchantmentGlintOverride());
+                else if (oldMeta.hasEnchantmentGlintOverride())
+                    itemMeta.setEnchantmentGlintOverride(oldMeta.getEnchantmentGlintOverride());
 
                 if (newMeta.hasMaxStackSize()) itemMeta.setMaxStackSize(newMeta.getMaxStackSize());
                 else if (oldMeta.hasMaxStackSize()) itemMeta.setMaxStackSize(oldMeta.getMaxStackSize());
@@ -315,10 +215,113 @@ public class ItemUpdater implements Listener {
         });
 
         Optional.ofNullable(NMSHandlers.getHandler()).ifPresent(nmsHandler ->
-            nmsHandler.consumableComponent(newItem, Optional.ofNullable(nmsHandler.consumableComponent(newItem)).orElse(nmsHandler.consumableComponent(oldItem)))
+                nmsHandler.consumableComponent(newItem, Optional.ofNullable(nmsHandler.consumableComponent(newItem)).orElse(nmsHandler.consumableComponent(oldItem)))
         );
 
         return newItem;
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!Settings.UPDATE_ITEMS.toBool()) return;
+
+        PlayerInventory inventory = event.getPlayer().getInventory();
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack oldItem = inventory.getItem(i);
+            ItemStack newItem = ItemUpdater.updateItem(oldItem);
+            if (oldItem == null || oldItem.equals(newItem)) continue;
+            inventory.setItem(i, newItem);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerPickUp(EntityPickupItemEvent event) {
+        if (!Settings.UPDATE_ITEMS.toBool()) return;
+        if (!(event.getEntity() instanceof Player)) return;
+
+        ItemStack oldItem = event.getItem().getItemStack();
+        ItemStack newItem = ItemUpdater.updateItem(oldItem);
+        if (oldItem.equals(newItem)) return;
+        event.getItem().setItemStack(newItem);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemEnchant(PrepareItemEnchantEvent event) {
+        String id = OraxenItems.getIdByItem(event.getItem());
+        ItemBuilder builder = OraxenItems.getItemById(id);
+        if (builder == null || !builder.hasOraxenMeta()) return;
+
+        if (builder.getOraxenMeta().isDisableEnchanting()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemEnchant(PrepareAnvilEvent event) {
+        ItemStack item = event.getInventory().getItem(0);
+        ItemStack result = event.getResult();
+        String id = OraxenItems.getIdByItem(item);
+        ItemBuilder builder = OraxenItems.getItemById(id);
+        if (builder == null || !builder.hasOraxenMeta()) return;
+
+        if (builder.getOraxenMeta().isDisableEnchanting()) {
+            if (result == null || item == null) return;
+            if (!result.getEnchantments().equals(item.getEnchantments()))
+                event.setResult(null);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onUseMaxDamageItem(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = player.getInventory().getItemInMainHand();
+
+        if (!VersionUtil.atOrAbove("1.20.5") || player.getGameMode() == GameMode.CREATIVE) return;
+        if (ItemUtils.isEmpty(itemStack) || ItemUtils.isTool(itemStack)) return;
+        if (!(itemStack.getItemMeta() instanceof Damageable damageable) || !damageable.hasMaxDamage()) return;
+
+        Optional.ofNullable(OraxenItems.getBuilderByItem(itemStack)).ifPresent(i -> {
+            if (i.isDamagedOnBlockBreak()) itemStack.damage(1, player);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onUseMaxDamageItem(EntityDamageByEntityEvent event) {
+        if (!VersionUtil.atOrAbove("1.20.5") || VersionUtil.atOrAbove("1.21.2")) return;
+        if (!(event.getDamager() instanceof LivingEntity entity)) return;
+        ItemStack itemStack = Optional.ofNullable(entity.getEquipment()).map(EntityEquipment::getItemInMainHand).orElse(null);
+
+        if (entity instanceof Player player && player.getGameMode() == GameMode.CREATIVE) return;
+        if (ItemUtils.isEmpty(itemStack) || ItemUtils.isTool(itemStack)) return;
+        if (!(itemStack.getItemMeta() instanceof Damageable damageable) || !damageable.hasMaxDamage()) return;
+
+        Optional.ofNullable(OraxenItems.getBuilderByItem(itemStack)).ifPresent(i -> {
+            if (i.isDamagedOnEntityHit()) itemStack.damage(1, entity);
+        });
+    }
+
+    // Until Paper changes getReplacement to use food-component, this is the best way
+    @EventHandler(ignoreCancelled = true)
+    public void onUseConvertedTo(PlayerItemConsumeEvent event) {
+        ItemStack itemStack = event.getItem();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (!VersionUtil.atOrAbove("1.21") && itemMeta == null) return;
+        ItemStack usingConvertsTo = ItemUtils.getUsingConvertsTo(itemMeta);
+        if (usingConvertsTo == null || !itemStack.isSimilar(ItemUpdater.updateItem(usingConvertsTo))) return;
+
+        PlayerInventory inventory = event.getPlayer().getInventory();
+        if (inventory.firstEmpty() == -1) event.setItem(event.getItem().add(usingConvertsTo.getAmount()));
+        else Bukkit.getScheduler().runTask(OraxenPlugin.get(), () -> {
+            for (int i = 0; i < inventory.getSize(); i++) {
+                ItemStack oldItem = inventory.getItem(i);
+                ItemStack newItem = ItemUpdater.updateItem(oldItem);
+                if (!itemStack.isSimilar(newItem)) continue;
+
+                // Remove the item and add it to fix stacking
+                inventory.setItem(i, null);
+                inventory.addItem(newItem);
+            }
+        });
     }
 
 }

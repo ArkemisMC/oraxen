@@ -5,7 +5,8 @@ import org.bukkit.entity.Player;
 
 public class PapiAliases {
 
-    private PapiAliases() {}
+    private PapiAliases() {
+    }
 
     public static String setPlaceholders(Player player, String text) {
         return PlaceholderAPI.setPlaceholders(player, text);

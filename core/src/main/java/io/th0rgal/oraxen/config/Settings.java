@@ -156,7 +156,11 @@ public enum Settings {
     public Object getValue() {
         return OraxenPlugin.get().getConfigsManager().getSettings().get(path);
     }
-    public void setValue(Object value) { setValue(value, true); }
+
+    public void setValue(Object value) {
+        setValue(value, true);
+    }
+
     public void setValue(Object value, boolean save) {
         YamlConfiguration settingFile = OraxenPlugin.get().getConfigsManager().getSettings();
         settingFile.set(path, value);

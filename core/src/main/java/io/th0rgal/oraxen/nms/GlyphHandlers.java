@@ -23,19 +23,8 @@ import java.util.regex.Pattern;
 
 public class GlyphHandlers {
 
-    private enum GlyphHandler {
-        NMS, VANILLA;
-
-        public static GlyphHandler get() {
-            try {
-                return GlyphHandler.valueOf(Settings.GLYPH_HANDLER.toString());
-            } catch (IllegalArgumentException e) {
-                Logs.logError("Invalid glyph handler: " + Settings.GLYPH_HANDLER + ", defaulting to VANILLA", true);
-                Logs.logError("Valid options are: NMS, VANILLA", true);
-                return GlyphHandler.VANILLA;
-            }
-        }
-    }
+    private static final Key randomKey = Key.key("random");
+    private static final Pattern colorableRegex = Pattern.compile("<glyph:.*:(c|colorable)>");
 
     public static boolean isNms() {
         return GlyphHandler.get() == GlyphHandler.NMS;
@@ -45,7 +34,6 @@ public class GlyphHandlers {
         if (player != null) return escapeGlyphs(component, player);
         else return transformGlyphs(component, isUtf);
     }
-    private static final Key randomKey = Key.key("random");
 
     private static Component escapeGlyphs(Component component, @NotNull Player player) {
         component = GlobalTranslator.render(component, player.locale());
@@ -77,8 +65,6 @@ public class GlyphHandlers {
 
         return component;
     }
-
-    private static final Pattern colorableRegex = Pattern.compile("<glyph:.*:(c|colorable)>");
 
     private static Component transformGlyphs(Component component, boolean isUtf) {
         String serialized = AdventureUtils.MINI_MESSAGE_EMPTY.serialize(component);
@@ -128,5 +114,19 @@ public class GlyphHandlers {
             }
             return string;
         };
+    }
+
+    private enum GlyphHandler {
+        NMS, VANILLA;
+
+        public static GlyphHandler get() {
+            try {
+                return GlyphHandler.valueOf(Settings.GLYPH_HANDLER.toString());
+            } catch (IllegalArgumentException e) {
+                Logs.logError("Invalid glyph handler: " + Settings.GLYPH_HANDLER + ", defaulting to VANILLA", true);
+                Logs.logError("Valid options are: NMS, VANILLA", true);
+                return GlyphHandler.VANILLA;
+            }
+        }
     }
 }

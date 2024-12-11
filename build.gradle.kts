@@ -15,18 +15,9 @@ plugins {
 }
 
 class NMSVersion(val nmsVersion: String, val serverVersion: String)
+
 infix fun String.toNms(that: String): NMSVersion = NMSVersion(this, that)
 val SUPPORTED_VERSIONS: List<NMSVersion> = listOf(
-    //"v1_18_R1" toNms "1.18.1-R0.1-SNAPSHOT",
-    //"v1_18_R2" toNms "1.18.2-R0.1-SNAPSHOT",
-    //"v1_19_R1" toNms "1.19.2-R0.1-SNAPSHOT",
-    //"v1_19_R2" toNms "1.19.3-R0.1-SNAPSHOT",
-    //"v1_19_R3" toNms "1.19.4-R0.1-SNAPSHOT",
-    "v1_20_R1" toNms "1.20.1-R0.1-SNAPSHOT",
-    "v1_20_R2" toNms "1.20.2-R0.1-SNAPSHOT",
-    "v1_20_R3" toNms "1.20.4-R0.1-SNAPSHOT",
-    "v1_20_R4" toNms "1.20.6-R0.1-SNAPSHOT",
-    "v1_21_R1" toNms "1.21.1-R0.1-SNAPSHOT",
     "v1_21_R2" toNms "1.21.3-R0.1-SNAPSHOT"
 )
 
@@ -59,6 +50,7 @@ allprojects {
         maven("https://hub.jeff-media.com/nexus/repository/jeff-media-public/") // CustomBlockData
         maven("https://repo.triumphteam.dev/snapshots") // actions-code, actions-spigot
         maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }// MythicMobs
+        maven("https://mvn.lumine.io/repository/maven-public/")
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots") // commandAPI snapshots
         maven("https://repo.oraxen.com/releases")
         maven("https://repo.oraxen.com/snapshots")
@@ -72,7 +64,6 @@ allprojects {
     }
 
     dependencies {
-        val actionsVersion = "1.0.0-SNAPSHOT"
         compileOnly("gs.mclo:java:2.2.1")
 
         compileOnly("net.kyori:adventure-text-minimessage:$adventureVersion")
@@ -81,17 +72,15 @@ allprojects {
         compileOnly("net.kyori:adventure-platform-bukkit:$platformVersion")
         compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
         compileOnly("me.clip:placeholderapi:2.11.6")
-        compileOnly("me.gabytm.util:actions-core:$actionsVersion")
-        compileOnly("org.springframework:spring-expression:6.0.6")
-        compileOnly("io.lumine:Mythic-Dist:5.7.0-SNAPSHOT")
-        compileOnly("io.lumine:MythicCrucible:1.6.0-SNAPSHOT")
+        compileOnly("org.springframework:spring-expression:6.1.14")
+        implementation("io.lumine:Mythic-Dist:5.7.2")
+        implementation("io.lumine:MythicCrucible-Plugin:2.0.0")
         compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.9")
-        compileOnly("commons-io:commons-io:2.11.0")
+        compileOnly("commons-io:commons-io:2.14.0")
         compileOnly("com.google.code.gson:gson:$googleGsonVersion")
         compileOnly("com.ticxo.modelengine:ModelEngine:R4.0.4")
         compileOnly("com.ticxo.modelengine:api:R3.1.8")
         compileOnly(files("../libs/compile/BSP.jar"))
-        compileOnly("io.lumine:MythicLib:1.1.6") // Remove and add deps needed for Polymath
         compileOnly("io.lumine:MythicLib-dist:1.6.2-SNAPSHOT")
         compileOnly("net.Indyuce:MMOItems-API:6.9.5-SNAPSHOT")
         compileOnly("org.joml:joml:1.10.5") // Because pre 1.19.4 api does not have this in the server-jar
@@ -113,7 +102,7 @@ allprojects {
         implementation("org.jetbrains:annotations:24.1.0") { isTransitive = false }
         implementation("dev.triumphteam:triumph-gui:3.1.10") { exclude("net.kyori") }
 
-        implementation("me.gabytm.util:actions-spigot:$actionsVersion") { exclude(group = "com.google.guava") }
+        implementation(files("./libs/actions-spigot-1.0.0-SNAPSHOT-all.jar"))
     }
 }
 
@@ -122,8 +111,6 @@ dependencies {
     SUPPORTED_VERSIONS.forEach { implementation(project(path = ":${it.nmsVersion}", configuration = "reobf")) }
 }
 
-
-
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
@@ -131,28 +118,25 @@ java {
 }
 
 tasks {
-
     compileJava {
         options.encoding = Charsets.UTF_8.name()
     }
 
-    javadoc {
-        options.encoding = Charsets.UTF_8.name()
-    }
-
     processResources {
-        filesNotMatching(listOf("**/*.png", "**/*.ogg", "**/models/**", "**/textures/**", "**/font/**.json", "**/plugin.yml")) {
+        filesNotMatching(
+            listOf(
+                "**/*.png",
+                "**/*.ogg",
+                "**/models/**",
+                "**/textures/**",
+                "**/font/**.json",
+                "**/plugin.yml"
+            )
+        ) {
             expand(mapOf(project.version.toString() to pluginVersion))
         }
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         filteringCharset = Charsets.UTF_8.name()
-    }
-
-    runServer {
-        downloadPlugins {
-            url("https://ci.dmulloy2.net/job/ProtocolLib/lastSuccessfulBuild/artifact/build/libs/ProtocolLib.jar")
-        }
-        minecraftVersion("1.20.4")
     }
 
     shadowJar {
@@ -175,8 +159,16 @@ tasks {
                     "Version" to pluginVersion,
                     "Build-Timestamp" to SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSZ").format(Date.from(Instant.now())),
                     "Created-By" to "Gradle ${gradle.gradleVersion}",
-                    "Build-Jdk" to "${System.getProperty("java.version")} ${System.getProperty("java.vendor")} ${System.getProperty("java.vm.version")}",
-                    "Build-OS" to "${System.getProperty("os.name")} ${System.getProperty("os.arch")} ${System.getProperty("os.version")}",
+                    "Build-Jdk" to "${System.getProperty("java.version")} ${System.getProperty("java.vendor")} ${
+                        System.getProperty(
+                            "java.vm.version"
+                        )
+                    }",
+                    "Build-OS" to "${System.getProperty("os.name")} ${System.getProperty("os.arch")} ${
+                        System.getProperty(
+                            "os.version"
+                        )
+                    }",
                     "Compiled" to (project.findProperty("oraxen_compiled")?.toString() ?: "true").toBoolean()
                 )
             )
@@ -187,7 +179,6 @@ tasks {
 
     compileJava.get().dependsOn(clean)
     build.get().dependsOn(shadowJar)
-    build.get().dependsOn(publishToMavenLocal)
 }
 
 bukkit {
@@ -195,7 +186,7 @@ bukkit {
     main = "io.th0rgal.oraxen.OraxenPlugin"
     version = pluginVersion
     name = "Oraxen"
-    apiVersion = "1.18"
+    apiVersion = "1.21"
     authors = listOf("th0rgal", "https://github.com/oraxen/oraxen/blob/master/CONTRIBUTORS.md")
     softDepend = listOf(
         "ProtocolLib",

@@ -24,7 +24,8 @@ import java.util.Objects;
 
 public class RecipesManager {
 
-    private RecipesManager() {}
+    private RecipesManager() {
+    }
 
     public static void load(JavaPlugin plugin) {
         if (Settings.RESET_RECIPES.toBool()) {

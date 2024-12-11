@@ -27,7 +27,8 @@ public class BottledExpMechanicListener implements Listener {
         String itemID = OraxenItems.getIdByItem(item);
         Player player = event.getPlayer();
 
-        if (action != Action.LEFT_CLICK_AIR && action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
+        if (action != Action.LEFT_CLICK_AIR && action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK)
+            return;
         if (item == null || factory.isNotImplementedIn(itemID)) return;
 
         BottledExpMechanic mechanic = (BottledExpMechanic) factory.getMechanic(itemID);
@@ -40,7 +41,6 @@ public class BottledExpMechanicListener implements Listener {
             player.setExp(0);
 
             EventUtils.callEvent(new PlayerItemDamageEvent(player, item, factory.getDurabilityCost()));
-        }
-        else Message.NOT_ENOUGH_EXP.send(player);
+        } else Message.NOT_ENOUGH_EXP.send(player);
     }
 }

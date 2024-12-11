@@ -12,8 +12,7 @@ public enum CustomEventType {
     PICKUP(PickupListener::new),
     EQUIP(EquipListener::new),
     UNEQUIP(UnequipListener::new),
-    DEATH(DeathListener::new)
-    ;
+    DEATH(DeathListener::new);
 
     public final CustomListenerConstructor constructor;
 

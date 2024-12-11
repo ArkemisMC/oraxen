@@ -37,6 +37,10 @@ public class ArmorListener implements Listener {
     }
     //Event Priority is highest because other plugins might cancel the events before we check.
 
+    static boolean isEmpty(ItemStack item) {
+        return (item == null || item.getType().isAir() || item.getAmount() == 0);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public final void onClick(final InventoryClickEvent event) {
         boolean shift = false, numberkey = false;
@@ -134,10 +138,6 @@ public class ArmorListener implements Listener {
             event.setCancelled(true);
     }
 
-    static boolean isEmpty(ItemStack item) {
-        return (item == null || item.getType().isAir() || item.getAmount() == 0);
-    }
-
 //	@EventHandler(priority =  EventPriority.HIGHEST, ignoreCancelled = true)
 //	public void onFOnEmptyArmorSlot(InventoryClickEvent event) {
 //		if(event.getAction() != InventoryAction.HOTBAR_SWAP) {
@@ -204,7 +204,8 @@ public class ArmorListener implements Listener {
         ArmorType type = ArmorType.matchType(event.getBrokenItem());
         Player player = event.getPlayer();
         if (type == null) return;
-        if (EventUtils.callEvent(new ArmorEquipEvent(player, ArmorEquipEvent.EquipMethod.BROKE, type, event.getBrokenItem(), null))) return;
+        if (EventUtils.callEvent(new ArmorEquipEvent(player, ArmorEquipEvent.EquipMethod.BROKE, type, event.getBrokenItem(), null)))
+            return;
 
         ItemStack i = event.getBrokenItem().clone();
         i.setAmount(1);

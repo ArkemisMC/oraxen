@@ -51,36 +51,9 @@ import java.util.function.Function;
 
 public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
 
-    private final Map<Channel, ChannelHandler> encoder = Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<Channel, ChannelHandler> decoder = Collections.synchronizedMap(new WeakHashMap<>());
-
     private static final Map<PacketType<?>, ConnectionCodec> CODEC_MAP = new HashMap<>();
     private static final Map<PacketType<?>, Integer> ID_MAP = new HashMap<>();
-
-    private record ConnectionCodec(StreamCodec<ByteBuf, Packet<?>> codec, ProtocolInfo<?> protocol) {
-    }
-
-    private static class PacketProtocol {
-        private final ProtocolInfo<?> clientboundInfo;
-        private final ProtocolInfo<?> serverboundInfo;
-
-        private final List<PacketType<?>> clientbounds = new ArrayList<>();
-        private final List<PacketType<?>> serverbounds = new ArrayList<>();
-
-        public PacketProtocol(ProtocolInfo<?> clientbound, ProtocolInfo<?> serverbound, Class<?> clazz) {
-            clientboundInfo = clientbound;
-            serverboundInfo = serverbound;
-            for (Field field : clazz.getFields()) {
-                try {
-                    PacketType<?> type = (PacketType<?>) field.get(null);
-                    switch (type.flow()) {
-                        case CLIENTBOUND -> clientbounds.add(type);
-                        case SERVERBOUND -> serverbounds.add(type);
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
-    }
+    private static final AttributeKey<ConnectionCodec> CODEC_ATTRIBUTE_KEY = AttributeKey.newInstance("oraxen.codec.key");
 
     static {
         Field getToId = Arrays.stream(IdDispatchCodec.class.getDeclaredFields()).filter(f -> Object2IntMap.class.isAssignableFrom(f.getType())).findFirst().orElseThrow();
@@ -102,7 +75,7 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
         )) {
             for (PacketType<?> clientbound : packetProtocol.clientbounds) {
                 if (packetProtocol.clientboundInfo == null) break;
-                IdDispatchCodec<ByteBuf, ?, ?> codec = (IdDispatchCodec<ByteBuf, ? ,?>) packetProtocol.clientboundInfo.codec();
+                IdDispatchCodec<ByteBuf, ?, ?> codec = (IdDispatchCodec<ByteBuf, ?, ?>) packetProtocol.clientboundInfo.codec();
                 try {
                     Object2IntMap<?> object2IntMap = (Object2IntMap<?>) getToId.get(codec);
                     List<?> objects = (List<?>) getById.get(codec);
@@ -112,11 +85,12 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
                             ID_MAP.put(clientbound, object2IntMap.getInt(clientbound));
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
             for (PacketType<?> serverbound : packetProtocol.serverbounds) {
                 if (packetProtocol.serverboundInfo == null) break;
-                IdDispatchCodec<ByteBuf, ?, ?> codec = (IdDispatchCodec<ByteBuf, ? ,?>) packetProtocol.serverboundInfo.codec();
+                IdDispatchCodec<ByteBuf, ?, ?> codec = (IdDispatchCodec<ByteBuf, ?, ?>) packetProtocol.serverboundInfo.codec();
                 try {
                     Object2IntMap<?> object2IntMap = (Object2IntMap<?>) getToId.get(codec);
                     List<?> objects = (List<?>) getById.get(codec);
@@ -126,9 +100,26 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
                             ID_MAP.put(serverbound, object2IntMap.getInt(serverbound));
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
+    }
+
+    private final Map<Channel, ChannelHandler> encoder = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<Channel, ChannelHandler> decoder = Collections.synchronizedMap(new WeakHashMap<>());
+
+    private static void swapProtocolIfNeeded(Attribute<ConnectionCodec> protocolAttribute, Packet<?> packet) {
+        ProtocolInfo<?> connectionProtocol = CODEC_MAP.get(packet.type()).protocol;
+        if (connectionProtocol != null) {
+            ConnectionCodec codecData = protocolAttribute.get();
+            ProtocolInfo<?> connectionProtocol2 = codecData.protocol;
+            if (connectionProtocol.id() != connectionProtocol2.id()) {
+                StreamCodec<ByteBuf, Packet<?>> codecData2 = (StreamCodec<ByteBuf, Packet<?>>) connectionProtocol.codec();
+                protocolAttribute.set(new ConnectionCodec(codecData2, connectionProtocol));
+            }
+        }
+
     }
 
     @Override
@@ -278,8 +269,35 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
         }
     }
 
+    private record ConnectionCodec(StreamCodec<ByteBuf, Packet<?>> codec, ProtocolInfo<?> protocol) {
+    }
+
+    private static class PacketProtocol {
+        private final ProtocolInfo<?> clientboundInfo;
+        private final ProtocolInfo<?> serverboundInfo;
+
+        private final List<PacketType<?>> clientbounds = new ArrayList<>();
+        private final List<PacketType<?>> serverbounds = new ArrayList<>();
+
+        public PacketProtocol(ProtocolInfo<?> clientbound, ProtocolInfo<?> serverbound, Class<?> clazz) {
+            clientboundInfo = clientbound;
+            serverboundInfo = serverbound;
+            for (Field field : clazz.getFields()) {
+                try {
+                    PacketType<?> type = (PacketType<?>) field.get(null);
+                    switch (type.flow()) {
+                        case CLIENTBOUND -> clientbounds.add(type);
+                        case SERVERBOUND -> serverbounds.add(type);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
     private static class CustomDataSerializer extends FriendlyByteBuf {
-        @Nullable private final Player player;
+        @Nullable
+        private final Player player;
 
         public CustomDataSerializer(@Nullable Player player, ByteBuf bytebuf) {
             super(bytebuf);
@@ -324,7 +342,8 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
                 Tag base = compound.get(key);
                 if (base instanceof CompoundTag tag) transform(tag, transformer);
                 else if (base instanceof ListTag listTag) transform(listTag, transformer);
-                else if (base instanceof StringTag) compound.put(key, StringTag.valueOf(transformer.apply(base.getAsString())));
+                else if (base instanceof StringTag)
+                    compound.put(key, StringTag.valueOf(transformer.apply(base.getAsString())));
             }
         }
 
@@ -341,10 +360,9 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
         }
     }
 
-    private static final AttributeKey<ConnectionCodec> CODEC_ATTRIBUTE_KEY = AttributeKey.newInstance("oraxen.codec.key");
-
     private static class CustomPacketEncoder extends MessageToByteEncoder<Packet<?>> {
-        @Nullable private final Player player;
+        @Nullable
+        private final Player player;
         private final Channel channel;
 
         private CustomPacketEncoder(@Nullable Player player, @NotNull Channel channel) {
@@ -388,21 +406,9 @@ public class GlyphHandler implements io.th0rgal.oraxen.nms.GlyphHandler {
 
     }
 
-    private static void swapProtocolIfNeeded(Attribute<ConnectionCodec> protocolAttribute, Packet<?> packet) {
-        ProtocolInfo<?> connectionProtocol = CODEC_MAP.get(packet.type()).protocol;
-        if (connectionProtocol != null) {
-            ConnectionCodec codecData = protocolAttribute.get();
-            ProtocolInfo<?> connectionProtocol2 = codecData.protocol;
-            if (connectionProtocol.id() != connectionProtocol2.id()) {
-                StreamCodec<ByteBuf, Packet<?>> codecData2 = (StreamCodec<ByteBuf, Packet<?>>) connectionProtocol.codec();
-                protocolAttribute.set(new ConnectionCodec(codecData2, connectionProtocol));
-            }
-        }
-
-    }
-
     private static class CustomPacketDecoder extends ByteToMessageDecoder {
-        @Nullable private final Player player;
+        @Nullable
+        private final Player player;
 
         private CustomPacketDecoder(@Nullable Player player) {
             this.player = player;
